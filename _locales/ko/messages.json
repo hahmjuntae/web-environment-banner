@@ -1,0 +1,71 @@
+{
+  "appName": { "message": "Web Environment Banner" },
+  "appDesc": {
+    "message": "등록한 URL에 접속하면 페이지 최상단에 로컬·개발·운영 환경 배너를 표시합니다."
+  },
+
+  "optEnabled": { "message": "사용" },
+  "optSectionEnvironments": { "message": "환경" },
+  "optAddEnvironment": { "message": "환경 추가" },
+  "optSectionBanner": { "message": "배너" },
+  "optSectionCheckUrl": { "message": "URL 확인" },
+  "optSectionSettingsFile": { "message": "설정 파일" },
+
+  "optPosition": { "message": "위치" },
+  "optPositionTop": { "message": "최상단" },
+  "optPositionBottom": { "message": "최하단" },
+  "optDirection": { "message": "방향" },
+  "optDirectionLeft": { "message": "왼쪽" },
+  "optDirectionRight": { "message": "오른쪽" },
+  "optHeight": { "message": "높이" },
+  "optFontSize": { "message": "글자" },
+  "optSpeed": { "message": "속도" },
+  "optGap": { "message": "간격" },
+
+  "optShowWarning": { "message": "경고 아이콘" },
+  "optStripes": { "message": "사선 패턴" },
+  "optPushContent": { "message": "컨텐츠 밀어내기" },
+  "optOffsetFixed": { "message": "고정 헤더 함께 내리기" },
+  "optPauseOnHover": { "message": "마우스 올리면 정지" },
+  "optDismissible": { "message": "닫기 버튼" },
+
+  "optExport": { "message": "내보내기" },
+  "optImport": { "message": "가져오기" },
+  "optReset": { "message": "초기화" },
+
+  "optEnvEnabledTitle": { "message": "이 환경 사용" },
+  "optMoveUp": { "message": "위로" },
+  "optMoveDown": { "message": "아래로" },
+  "optDelete": { "message": "삭제" },
+  "optColor": { "message": "색" },
+  "optBackground": { "message": "배경" },
+  "optText": { "message": "글자" },
+  "optUrlPatterns": { "message": "URL 패턴" },
+
+  "optEnvNamePlaceholder": { "message": "LOCAL" },
+  "optPatternsPlaceholder": {
+    "message": "localhost:3000\n*.dev.example.com\nhttps://admin.example.com/*"
+  },
+  "optTesterPlaceholder": { "message": "https://dev.example.com/login" },
+
+  "optNoMatch": { "message": "일치 없음" },
+  "optToastSaved": { "message": "저장됨" },
+  "optToastImported": { "message": "가져왔습니다" },
+  "optToastImportFailed": { "message": "가져오기 실패" },
+  "optToastReset": { "message": "초기화됨" },
+  "optConfirmDelete": {
+    "message": "\"$name$\" 삭제할까요?",
+    "placeholders": { "name": { "content": "$1", "example": "PRODUCTION" } }
+  },
+  "optConfirmReset": { "message": "모든 설정을 기본값으로 되돌릴까요?" },
+  "optNewEnvLabel": { "message": "NEW" },
+
+  "popCannotInject": { "message": "이 페이지에는 배너를 넣을 수 없습니다" },
+  "popNoMatch": { "message": "일치 없음" },
+  "popDisabled": { "message": "· 꺼져 있음" },
+  "popAdd": { "message": "추가" },
+  "popSettings": { "message": "설정" },
+
+  "bannerHideTitle": { "message": "이 탭에서 숨기기" },
+  "bannerHideLabel": { "message": "숨기기" }
+}

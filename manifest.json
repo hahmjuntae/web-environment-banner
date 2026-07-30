@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Web Environment Banner",
+  "name": "__MSG_appName__",
   "version": "0.1.0",
-  "description": "등록한 URL에 접속하면 페이지 최상단에 로컬·개발·운영 환경 배너를 표시합니다.",
+  "description": "__MSG_appDesc__",
+  "default_locale": "en",
   "minimum_chrome_version": "88",
   "icons": {
     "16": "assets/icon16.png",
@@ -12,7 +13,7 @@
   },
   "permissions": ["storage", "activeTab"],
   "action": {
-    "default_title": "Web Environment Banner",
+    "default_title": "__MSG_appName__",
     "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "assets/icon16.png",
@@ -29,6 +30,7 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "js": [
+        "src/lib/i18n.js",
         "src/lib/icons.js",
         "src/lib/font.js",
         "src/lib/defaults.js",

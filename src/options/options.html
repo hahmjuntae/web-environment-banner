@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,83 +16,91 @@
     <label class="toggle">
       <input type="checkbox" id="enabled">
       <span class="toggle-track"><span class="toggle-knob"></span></span>
-      <span class="toggle-label">사용</span>
+      <span class="toggle-label" data-i18n="optEnabled">Enabled</span>
     </label>
   </header>
 
   <section class="section">
     <div class="section-head">
-      <h2>환경</h2>
+      <h2 data-i18n="optSectionEnvironments">Environments</h2>
       <button type="button" id="addEnv" class="btn primary">
-        <span class="btn-icon" data-icon="plus"></span>환경 추가
+        <span class="btn-icon" data-icon="plus"></span>
+        <span data-i18n="optAddEnvironment">Add environment</span>
       </button>
     </div>
     <div id="envList" class="env-list"></div>
   </section>
 
   <section class="section">
-    <div class="section-head"><h2>배너</h2></div>
+    <div class="section-head"><h2 data-i18n="optSectionBanner">Banner</h2></div>
     <div class="field-grid">
       <label class="field">
-        <span class="label">위치</span>
+        <span class="label" data-i18n="optPosition">Position</span>
         <span class="select">
           <select id="position">
-            <option value="top">최상단</option>
-            <option value="bottom">최하단</option>
+            <option value="top" data-i18n="optPositionTop">Top</option>
+            <option value="bottom" data-i18n="optPositionBottom">Bottom</option>
           </select>
           <span class="select-arrow" data-icon="chevronDown"></span>
         </span>
       </label>
       <label class="field">
-        <span class="label">방향</span>
+        <span class="label" data-i18n="optDirection">Direction</span>
         <span class="select">
           <select id="direction">
-            <option value="left">왼쪽</option>
-            <option value="right">오른쪽</option>
+            <option value="left" data-i18n="optDirectionLeft">Left</option>
+            <option value="right" data-i18n="optDirectionRight">Right</option>
           </select>
           <span class="select-arrow" data-icon="chevronDown"></span>
         </span>
       </label>
       <label class="field">
-        <span class="label">높이 <output id="heightOut" class="mono"></output></span>
+        <span class="label"><span data-i18n="optHeight">Height</span> <output id="heightOut" class="mono"></output></span>
         <input type="range" id="height" min="14" max="80" step="1">
       </label>
       <label class="field">
-        <span class="label">글자 <output id="fontSizeOut" class="mono"></output></span>
+        <span class="label"><span data-i18n="optFontSize">Font size</span> <output id="fontSizeOut" class="mono"></output></span>
         <input type="range" id="fontSize" min="8" max="32" step="1">
       </label>
       <label class="field">
-        <span class="label">속도 <output id="speedOut" class="mono"></output></span>
+        <span class="label"><span data-i18n="optSpeed">Speed</span> <output id="speedOut" class="mono"></output></span>
         <input type="range" id="speed" min="5" max="300" step="5">
       </label>
       <label class="field">
-        <span class="label">간격 <output id="gapOut" class="mono"></output></span>
+        <span class="label"><span data-i18n="optGap">Gap</span> <output id="gapOut" class="mono"></output></span>
         <input type="range" id="gap" min="4" max="160" step="2">
       </label>
     </div>
     <div class="check-row">
-      <label class="check"><input type="checkbox" id="showWarning"><span>경고 아이콘</span></label>
-      <label class="check"><input type="checkbox" id="stripes"><span>사선 패턴</span></label>
-      <label class="check"><input type="checkbox" id="pushContent"><span>컨텐츠 밀어내기</span></label>
-      <label class="check"><input type="checkbox" id="offsetFixed"><span>고정 헤더 함께 내리기</span></label>
-      <label class="check"><input type="checkbox" id="pauseOnHover"><span>마우스 올리면 정지</span></label>
-      <label class="check"><input type="checkbox" id="dismissible"><span>닫기 버튼</span></label>
+      <label class="check"><input type="checkbox" id="showWarning"><span data-i18n="optShowWarning">Warning icon</span></label>
+      <label class="check"><input type="checkbox" id="stripes"><span data-i18n="optStripes">Diagonal stripes</span></label>
+      <label class="check"><input type="checkbox" id="pushContent"><span data-i18n="optPushContent">Push page content</span></label>
+      <label class="check"><input type="checkbox" id="offsetFixed"><span data-i18n="optOffsetFixed">Offset fixed headers</span></label>
+      <label class="check"><input type="checkbox" id="pauseOnHover"><span data-i18n="optPauseOnHover">Pause on hover</span></label>
+      <label class="check"><input type="checkbox" id="dismissible"><span data-i18n="optDismissible">Close button</span></label>
     </div>
   </section>
 
   <section class="section">
-    <div class="section-head"><h2>URL 확인</h2></div>
-    <input type="text" id="tester" class="input mono" placeholder="https://dev.example.com/login" spellcheck="false">
+    <div class="section-head"><h2 data-i18n="optSectionCheckUrl">Check URL</h2></div>
+    <input type="text" id="tester" class="input mono" spellcheck="false"
+      placeholder="https://dev.example.com/login" data-i18n-placeholder="optTesterPlaceholder">
     <div id="testerResult" class="tester-result"></div>
   </section>
 
   <section class="section">
-    <div class="section-head"><h2>설정 파일</h2></div>
+    <div class="section-head"><h2 data-i18n="optSectionSettingsFile">Settings file</h2></div>
     <div class="btn-row">
-      <button type="button" id="exportBtn" class="btn"><span class="btn-icon" data-icon="download"></span>내보내기</button>
-      <button type="button" id="importBtn" class="btn"><span class="btn-icon" data-icon="upload"></span>가져오기</button>
+      <button type="button" id="exportBtn" class="btn">
+        <span class="btn-icon" data-icon="download"></span><span data-i18n="optExport">Export</span>
+      </button>
+      <button type="button" id="importBtn" class="btn">
+        <span class="btn-icon" data-icon="upload"></span><span data-i18n="optImport">Import</span>
+      </button>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
-      <button type="button" id="resetBtn" class="btn danger"><span class="btn-icon" data-icon="rotate"></span>초기화</button>
+      <button type="button" id="resetBtn" class="btn danger">
+        <span class="btn-icon" data-icon="rotate"></span><span data-i18n="optReset">Reset</span>
+      </button>
     </div>
   </section>
 </div>
@@ -102,12 +110,19 @@
 <template id="envTemplate">
   <article class="env reveal" data-id="">
     <div class="env-head">
-      <label class="check"><input type="checkbox" data-f="enabled"></label>
-      <input type="text" class="input env-name" data-f="label" maxlength="40" placeholder="LOCAL">
+      <label class="check">
+        <input type="checkbox" data-f="enabled" title="Enable this environment"
+          data-i18n-title="optEnvEnabledTitle">
+      </label>
+      <input type="text" class="input env-name" data-f="label" maxlength="40"
+        placeholder="LOCAL" data-i18n-placeholder="optEnvNamePlaceholder">
       <div class="env-actions">
-        <button type="button" class="icon-btn" data-act="up" data-icon="chevronUp" title="위로"></button>
-        <button type="button" class="icon-btn" data-act="down" data-icon="chevronDown" title="아래로"></button>
-        <button type="button" class="icon-btn danger" data-act="del" data-icon="trash" title="삭제"></button>
+        <button type="button" class="icon-btn" data-act="up" data-icon="chevronUp"
+          title="Move up" data-i18n-title="optMoveUp"></button>
+        <button type="button" class="icon-btn" data-act="down" data-icon="chevronDown"
+          title="Move down" data-i18n-title="optMoveDown"></button>
+        <button type="button" class="icon-btn danger" data-act="del" data-icon="trash"
+          title="Delete" data-i18n-title="optDelete"></button>
       </div>
     </div>
 
@@ -115,22 +130,24 @@
 
     <div class="env-body">
       <div class="env-color">
-        <span class="label">색</span>
+        <span class="label" data-i18n="optColor">Color</span>
         <div class="color-row">
-          <input type="color" data-f="bg" title="배경">
-          <input type="color" data-f="fg" title="글자">
+          <input type="color" data-f="bg" title="Background" data-i18n-title="optBackground">
+          <input type="color" data-f="fg" title="Text" data-i18n-title="optText">
           <div class="swatches" data-role="swatches"></div>
         </div>
       </div>
       <label class="field">
-        <span class="label">URL 패턴</span>
+        <span class="label" data-i18n="optUrlPatterns">URL patterns</span>
         <textarea class="input mono" data-f="patterns" rows="5" spellcheck="false"
+          data-i18n-placeholder="optPatternsPlaceholder"
           placeholder="localhost:3000&#10;*.dev.example.com&#10;https://admin.example.com/*"></textarea>
       </label>
     </div>
   </article>
 </template>
 
+<script src="../lib/i18n.js"></script>
 <script src="../lib/icons.js"></script>
 <script src="../lib/font.js"></script>
 <script src="../lib/defaults.js"></script>

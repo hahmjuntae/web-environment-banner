@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Web Environment Banner</title>
@@ -10,7 +10,7 @@
   <header class="head">
     <span class="mark" id="mark"></span>
     <strong class="title">Web Environment Banner</strong>
-    <label class="toggle" title="사용">
+    <label class="toggle" title="Enabled" data-i18n-title="optEnabled">
       <input type="checkbox" id="enabled">
       <span class="toggle-track"><span class="toggle-knob"></span></span>
     </label>
@@ -34,16 +34,17 @@
         <span class="select-arrow" data-icon="chevronDown"></span>
       </span>
       <button type="button" id="addBtn" class="btn primary">
-        <span class="btn-icon" data-icon="plus"></span>추가
+        <span class="btn-icon" data-icon="plus"></span><span data-i18n="popAdd">Add</span>
       </button>
     </div>
   </div>
 
   <button type="button" id="openOptions" class="btn wide">
-    <span class="btn-icon" data-icon="sliders"></span>설정
+    <span class="btn-icon" data-icon="sliders"></span><span data-i18n="popSettings">Settings</span>
   </button>
 </div>
 
+<script src="../lib/i18n.js"></script>
 <script src="../lib/icons.js"></script>
 <script src="../lib/font.js"></script>
 <script src="../lib/defaults.js"></script>

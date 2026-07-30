@@ -7,6 +7,7 @@
 
   const ICONS = root.EnvBannerIcons;
   const FONT = root.EnvBannerFont || { FAMILY: 'ui-sans-serif, system-ui, sans-serif' };
+  const t = root.EnvBannerI18n ? root.EnvBannerI18n.t : (_key, fallback) => fallback;
 
   const CSS = `
 :host {
@@ -140,7 +141,8 @@
 <div class="bar">
   <div class="viewport"><div class="track"><div class="group"></div><div class="group"></div></div></div>
   <div class="stripes"></div>
-  <button class="close" type="button" title="이 탭에서 숨기기" aria-label="숨기기">${ICONS.icon('x')}</button>
+  <button class="close" type="button" title="${escapeHtml(t('bannerHideTitle', 'Hide on this tab'))}"
+    aria-label="${escapeHtml(t('bannerHideLabel', 'Hide'))}">${ICONS.icon('x')}</button>
 </div>`;
 
     const bar = shadow.querySelector('.bar');

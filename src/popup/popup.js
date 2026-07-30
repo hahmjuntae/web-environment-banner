@@ -2,6 +2,7 @@
 (function () {
   'use strict';
 
+  const t = EnvBannerI18n.t;
   const $ = (sel) => document.querySelector(sel);
 
   const statusEl = $('#status');
@@ -51,7 +52,7 @@
     if (!isInjectable(tabUrl)) {
       previewFrame.hidden = true;
       assignEl.hidden = true;
-      statusEl.appendChild(text('이 페이지에는 넣을 수 없습니다', 'dim'));
+      statusEl.appendChild(text(t('popCannotInject', 'This page cannot show a banner'), 'dim'));
       return;
     }
 
@@ -71,13 +72,15 @@
       }
 
       statusEl.append(chip(found.env.bg), text(found.env.label), text(found.pattern, 'dim mono'));
-      if (!config.settings.enabled) statusEl.appendChild(text('· 꺼져 있음', 'dim'));
+      if (!config.settings.enabled) {
+        statusEl.appendChild(text(t('popDisabled', '· disabled'), 'dim'));
+      }
       return;
     }
 
     previewFrame.hidden = true;
     assignEl.hidden = false;
-    statusEl.appendChild(text('일치 없음', 'dim'));
+    statusEl.appendChild(text(t('popNoMatch', 'No match'), 'dim'));
 
     envSelect.textContent = '';
     config.environments.forEach((env) => {
@@ -124,6 +127,7 @@
     EnvBannerFont.ensure();
     $('#mark').innerHTML = EnvBannerIcons.MARK;
     paintIcons(document);
+    EnvBannerI18n.apply(document);
 
     config = await EnvBannerStore.get();
 

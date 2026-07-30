@@ -3,6 +3,7 @@
   'use strict';
 
   const D = EnvBannerDefaults;
+  const t = EnvBannerI18n.t;
   const $ = (sel) => document.querySelector(sel);
 
   const envList = $('#envList');
@@ -44,7 +45,7 @@
       // 내가 쓴 값이 onChange 로 되돌아와 편집 중인 입력을 리렌더하지 않도록 기억해 둔다
       lastSavedJson = JSON.stringify(EnvBannerStore.normalize(state));
       await EnvBannerStore.set(state);
-      showToast('저장됨');
+      showToast(t('optToastSaved', 'Saved'));
     }, 250);
   }
 
@@ -109,6 +110,7 @@
     });
 
     paintIcons(node);
+    EnvBannerI18n.apply(node);
     return node;
   }
 
@@ -192,7 +194,7 @@
     } else if (act.dataset.act === 'down' && index < state.environments.length - 1) {
       state.environments.splice(index + 1, 0, state.environments.splice(index, 1)[0]);
     } else if (act.dataset.act === 'del') {
-      if (!confirm(`"${env.label}" 삭제할까요?`)) return;
+      if (!confirm(t('optConfirmDelete', 'Delete "$1"?', [env.label]))) return;
       state.environments.splice(index, 1);
     } else {
       return;
@@ -207,7 +209,7 @@
     const preset = D.COLOR_PRESETS[state.environments.length % D.COLOR_PRESETS.length];
     state.environments.push({
       id: newId(),
-      label: 'NEW',
+      label: t('optNewEnvLabel', 'NEW'),
       enabled: true,
       bg: preset.bg,
       fg: preset.fg,
@@ -267,7 +269,7 @@
     if (!found) {
       const none = document.createElement('span');
       none.className = 'dim';
-      none.textContent = '일치 없음';
+      none.textContent = t('optNoMatch', 'No match');
       testerResult.appendChild(none);
       return;
     }
@@ -312,20 +314,20 @@
       renderEnvs();
       updateTester();
       await EnvBannerStore.set(state);
-      showToast('가져왔습니다');
+      showToast(t('optToastImported', 'Imported'));
     } catch (_) {
-      showToast('가져오기 실패');
+      showToast(t('optToastImportFailed', 'Import failed'));
     }
   });
 
   $('#resetBtn').addEventListener('click', async () => {
-    if (!confirm('기본값으로 되돌릴까요?')) return;
+    if (!confirm(t('optConfirmReset', 'Reset all settings to defaults?'))) return;
     state = EnvBannerStore.normalize(null);
     fillSettings();
     renderEnvs();
     updateTester();
     await EnvBannerStore.set(state);
-    showToast('초기화됨');
+    showToast(t('optToastReset', 'Reset to defaults'));
   });
 
   /* ── 초기화 ───────────────────────────── */
@@ -333,6 +335,7 @@
     EnvBannerFont.ensure();
     $('#mark').innerHTML = EnvBannerIcons.MARK;
     paintIcons(document);
+    EnvBannerI18n.apply(document);
 
     state = await EnvBannerStore.get();
     fillSettings();
