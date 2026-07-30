@@ -20,7 +20,7 @@
     direction: 'left',    // left | right
     gap: 28,              // 반복 아이템 간격(px)
     showWarning: true,    // 경고 아이콘
-    stripes: false,       // 사선 패턴
+    stripes: true,        // 사선 패턴
     pushContent: true,    // 문서 흐름을 배너 높이만큼 밀어내기
     offsetFixed: true,    // 사이트의 고정 헤더도 함께 내리기
     pauseOnHover: true,
@@ -34,7 +34,15 @@
       enabled: true,
       bg: '#34b27c',
       fg: '#0a0a0a',
-      patterns: ['localhost', '127.0.0.1', '0.0.0.0', '*.localhost']
+      patterns: [
+        'localhost',
+        '127.0.0.1',
+        '0.0.0.0',
+        '*.localhost',
+        'local.*',
+        'local-*',
+        '*-local.*'
+      ]
     },
     {
       id: 'development',
@@ -42,7 +50,7 @@
       enabled: true,
       bg: '#f5a312',
       fg: '#0a0a0a',
-      patterns: ['dev.*', '*.dev.*', '*-dev.*', 'stg.*', '*.stg.*']
+      patterns: ['dev.*', 'dev-*', '*.dev.*', '*-dev.*', 'stg.*', '*.stg.*']
     },
     {
       id: 'production',

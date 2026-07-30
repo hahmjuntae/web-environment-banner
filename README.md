@@ -18,8 +18,8 @@
 
 | 환경 | 색 | 기본 패턴 |
 |---|---|---|
-| LOCAL | `#34b27c` | `localhost` `127.0.0.1` `0.0.0.0` `*.localhost` |
-| DEVELOPMENT | `#f5a312` | `dev.*` `*.dev.*` `*-dev.*` `stg.*` `*.stg.*` |
+| LOCAL | `#34b27c` | `localhost` `127.0.0.1` `0.0.0.0` `*.localhost` `local.*` `local-*` `*-local.*` |
+| DEVELOPMENT | `#f5a312` | `dev.*` `dev-*` `*.dev.*` `*-dev.*` `stg.*` `*.stg.*` |
 | PRODUCTION | `#ec4860` | (비어 있음 — 직접 등록) |
 
 ## 쓰는 방법
@@ -36,16 +36,27 @@
 |---|---|---|
 | `localhost` | `http://localhost:3000/app`, `https://localhost/` | `https://mylocalhost.com/` |
 | `localhost:3000` | `http://localhost:3000/x` | `http://localhost:3001/x` |
-| `*.dev.example.com` | `api.dev.example.com`, `dev.example.com` | `dev.example.com.evil.io` |
 | `dev.*` | `https://dev.example.com/` | `https://api.dev.example.com/` |
+| `dev-*` | `https://dev-admin.example.com/` | `https://dev.example.com/` |
 | `*-dev.*` | `https://api-dev.example.com/` | |
+| `*.dev.example.com` | `api.dev.example.com`, `dev.example.com` | `dev.example.com.evil.io` |
 | `example.com/admin/*` | `http://example.com/admin/users` | `http://example.com/` |
 | `https://example.com/admin/*` | https 만 | `http://example.com/admin/users` |
 | `/^https:\/\/\w+\.corp\./` | 슬래시로 감싸면 정규식 그대로 사용 | |
 
 - scheme을 생략하면 모든 scheme, 포트를 생략하면 모든 포트에 매칭됩니다.
 - 경로를 생략하면 해당 호스트의 모든 경로에 매칭됩니다.
+- 호스트 자리의 `*`는 하이픈·점 위치를 구분합니다. `dev.*`는 `dev.`로 시작하는 것만,
+  `dev-*`는 `dev-`로 시작하는 것만 잡습니다.
+- **끝이 `*`인 패턴은 열려 있습니다.** `dev.*`는 `dev.example.com.other.io`도 매칭합니다.
+  범위를 정확히 제한하려면 `*.dev.example.com`처럼 끝까지 적으세요.
 - 여러 환경에 걸리면 **설정 화면에서 위에 있는 환경**이 이깁니다. `↑` `↓`로 우선순위를 조정하세요.
+
+패턴 매칭은 유닛 테스트로 고정되어 있습니다.
+
+```bash
+node test/match.test.js
+```
 
 ## 배너가 페이지를 가리지 않게 하는 방식
 

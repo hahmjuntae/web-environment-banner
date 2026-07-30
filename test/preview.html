@@ -61,9 +61,9 @@
     D.DEFAULT_ENVIRONMENTS.forEach((env) => row(env.label + '  ' + env.bg, env, base));
 
     row(
-      'STAGING  사선 패턴 · 높이 34 · 속도 90',
+      'STAGING  사선 끔 · 높이 28 · 속도 90',
       { id: 's', label: 'STAGING', enabled: true, bg: '#3d8bf5', fg: '#0a0a0a', patterns: [] },
-      Object.assign({}, base, { stripes: true, height: 34, fontSize: 13, speed: 90 })
+      Object.assign({}, base, { stripes: false, height: 28, fontSize: 12, speed: 90 })
     );
 
     row(
