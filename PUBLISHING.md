@@ -55,20 +55,21 @@ ZIP 자체를 검증하고 싶으면 `dist/`의 ZIP을 아무 곳에 풀어 그 
 
 ---
 
-## 3. 개인정보 처리방침 URL 만들기
+## 3. 개인정보 처리방침 URL
 
-대시보드에서 **공개된 URL**을 요구합니다. 로컬 파일은 안 되고, 심사관이 열 수 있어야 합니다.
-`PRIVACY.md` 내용을 아래 중 한 곳에 올리세요.
+이미 준비돼 있습니다. 저장소가 공개되어 있으므로 아래 URL을 그대로 대시보드에 입력하세요.
 
-**A. GitHub Gist (가장 빠름)**
-1. https://gist.github.com 접속
-2. 파일명 `PRIVACY.md`, 내용은 이 저장소의 `PRIVACY.md` 붙여넣기
-3. **Create public gist** (Secret gist는 URL을 아는 사람만 볼 수 있어 심사에서 문제될 수 있으니 public 권장)
-4. 주소창의 `https://gist.github.com/<계정>/<해시>` 를 사용
+```
+https://github.com/hahmjuntae/web-environment-banner/blob/main/PRIVACY.md
+```
 
-**B. GitHub Pages** — 저장소에 `docs/privacy.md`를 두고 Settings → Pages 활성화 → `https://<계정>.github.io/<저장소>/privacy`
+접근 확인됨(HTTP 200). 시크릿 창에서 열리는지 한 번 더 확인하면 안전합니다.
 
-**C. Notion** — 페이지 작성 후 우측 상단 공유 → **웹에 게시** → 생성된 링크 사용
+방침 내용을 고쳤을 때는 `PRIVACY.md`를 수정해 push 하면 같은 URL에 반영됩니다.
+
+> 더 깔끔한 URL을 원하면 저장소 Settings → Pages → Source를 `main` / `/ (root)`로 켜면
+> `https://hahmjuntae.github.io/web-environment-banner/PRIVACY` 로도 열립니다 (빌드에 몇 분 소요).
+> 심사에는 위 GitHub URL만으로 충분합니다.
 
 ---
 
@@ -194,8 +195,9 @@ and page content is never read.
 - **작은 프로모 타일**: `store/assets/promo-small-440x280.png`
 - 마퀴 프로모 타일(1400×560)은 비워도 됩니다 — 스토어 메인 피처링 후보에만 쓰입니다
 
-### 추가 필드 (선택)
-- 지원 URL / 홈페이지 URL이 있으면 입력. 없으면 비워 두어도 심사에 지장 없습니다
+### 추가 필드
+- 홈페이지 URL: `https://github.com/hahmjuntae/web-environment-banner`
+- 지원 URL: `https://github.com/hahmjuntae/web-environment-banner/issues`
 
 ---
 
