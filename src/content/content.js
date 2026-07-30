@@ -187,12 +187,19 @@
 
   EnvBannerStore.get().then((cfg) => {
     config = cfg;
+    EnvBannerI18n.setLocale(cfg.settings.locale);
     apply();
   });
 
   EnvBannerStore.onChange((cfg) => {
     const prev = config;
     config = cfg;
+    EnvBannerI18n.setLocale(cfg.settings.locale);
+    // 언어가 바뀌면 배너의 버튼 라벨을 다시 만들어야 한다
+    if (prev && prev.settings.locale !== cfg.settings.locale && instance) {
+      instance.destroy();
+      instance = null;
+    }
     // 높이·위치가 바뀌면 이전 보정값이 어긋나므로 걷어내고 다시 잡는다
     if (
       prev &&

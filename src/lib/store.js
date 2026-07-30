@@ -57,6 +57,7 @@
       settings[k] = source[k] !== undefined ? source[k] : D.DEFAULT_SETTINGS[k];
     });
 
+    settings.locale = ['auto', 'en', 'ko'].indexOf(settings.locale) !== -1 ? settings.locale : 'auto';
     settings.position = settings.position === 'bottom' ? 'bottom' : 'top';
     settings.direction = settings.direction === 'right' ? 'right' : 'left';
     settings.height = clampNumber(settings.height, 14, 80, D.DEFAULT_SETTINGS.height);

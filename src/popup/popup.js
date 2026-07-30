@@ -127,9 +127,10 @@
     EnvBannerFont.ensure();
     $('#mark').innerHTML = EnvBannerIcons.MARK;
     paintIcons(document);
-    EnvBannerI18n.apply(document);
 
     config = await EnvBannerStore.get();
+    EnvBannerI18n.setLocale(config.settings.locale);
+    EnvBannerI18n.apply(document);
 
     try {
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });

@@ -20,7 +20,26 @@ shot() { # 1:파일명 2:너비 3:높이 4:URL
 
 echo "생성 중..."
 shot screenshot-1-production 1280 800 "file://$ROOT/store/shots/shot1-production.html"
-shot screenshot-2-settings   1280 800 "file://$ROOT/src/options/options.html"
+
+# 설정 화면은 영어·기본값 상태로 고정해 캡처한다.
+# locale 이 auto 면 실행 환경의 시스템 언어를 따라가므로 스토어 기본 언어(영어)와 어긋난다.
+TMP="$ROOT/src/options/.shot-settings.html"
+node -e "
+const fs=require('fs');
+require('$ROOT/src/lib/defaults.js');
+const D=globalThis.EnvBannerDefaults;
+const cfg={
+  settings: Object.assign({}, D.DEFAULT_SETTINGS, { locale: 'en' }),
+  environments: D.DEFAULT_ENVIRONMENTS
+};
+const stub='<script>window.chrome={storage:{sync:{get:()=>Promise.resolve({envBannerConfig:'
+  + JSON.stringify(cfg) + '}),set:()=>Promise.resolve()},onChanged:{addListener(){},removeListener(){}}}};</'+'script>';
+const html=fs.readFileSync('$ROOT/src/options/options.html','utf8').replace('</head>', stub+'\n</head>');
+fs.writeFileSync('$TMP', html);
+"
+shot screenshot-2-settings   1280 800 "file://$TMP"
+rm -f "$TMP"
+
 shot screenshot-3-popup      1280 800 "file://$ROOT/store/shots/shot3-popup.html"
 shot screenshot-4-colors     1280 800 "file://$ROOT/store/shots/shot4-colors.html"
 shot promo-small-440x280      440  280 "file://$ROOT/store/shots/promo-440x280.html"

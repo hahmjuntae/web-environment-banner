@@ -61,6 +61,15 @@ for(const loc of locales){
   if(missing.length) console.log('  경고: '+loc+' 에 '+missing.length+'개 키 없음 → '+def+' 로 폴백');
 }
 
+// UI 문자열 카탈로그(messages.js) 의 언어 간 키 일치
+require(path.join(base,'src','lib','messages.js'));
+const UI=globalThis.EnvBannerMessages;
+for(const loc of Object.keys(UI)){
+  if(loc==='LOCALES'||loc==='en') continue;
+  const miss=Object.keys(UI.en).filter(k=>!(k in UI[loc]));
+  if(miss.length){console.log('  messages.js '+loc+' 키 누락: '+miss.join(', '));bad++}
+}
+
 if(bad) process.exit(1);
 console.log('  참조 '+new Set(list).size+'개 · 로케일 '+locales.join(', ')+' 확인');
 " || exit 1

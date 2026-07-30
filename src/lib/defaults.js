@@ -13,6 +13,7 @@
 
   const DEFAULT_SETTINGS = {
     enabled: true,
+    locale: 'auto',       // auto | en | ko — auto 는 브라우저 표시 언어
     position: 'top',      // top | bottom
     height: 40,           // px
     fontSize: 16,         // px

@@ -13,11 +13,17 @@
       <span class="mark" id="mark"></span>
       <h1>Web Environment Banner</h1>
     </div>
-    <label class="toggle">
-      <input type="checkbox" id="enabled">
-      <span class="toggle-track"><span class="toggle-knob"></span></span>
-      <span class="toggle-label" data-i18n="optEnabled">Enabled</span>
-    </label>
+    <div class="page-title-actions">
+      <span class="select select-compact">
+        <select id="locale" aria-label="Language" data-i18n-aria="optLanguage"></select>
+        <span class="select-arrow" data-icon="chevronDown"></span>
+      </span>
+      <label class="toggle">
+        <input type="checkbox" id="enabled">
+        <span class="toggle-track"><span class="toggle-knob"></span></span>
+        <span class="toggle-label" data-i18n="optEnabled">Enabled</span>
+      </label>
+    </div>
   </header>
 
   <section class="section">
@@ -147,6 +153,7 @@
   </article>
 </template>
 
+<script src="../lib/messages.js"></script>
 <script src="../lib/i18n.js"></script>
 <script src="../lib/icons.js"></script>
 <script src="../lib/font.js"></script>

@@ -11,6 +11,7 @@ so you never mistake production for development.
 - Pick a background and text color per environment
 - Tune height, font size, scroll speed and direction, spacing, diagonal stripes
 - Rendered inside a Shadow DOM, so it never collides with the page's CSS
+- Interface in English and Korean, switchable in the settings screen
 - Collects no data and makes no network requests
 
 ## Install
@@ -86,10 +87,11 @@ If a site adjusts its header's `top` on scroll, the two can fight. Turn this opt
 
 ```
 manifest.json               MV3 manifest
-_locales/{en,ko}/           UI strings (English is the default locale)
+_locales/{en,ko}/           store-facing name and description (English is the default locale)
 assets/icon*.png            toolbar and store icons (icon.svg / icon-small.svg are the sources)
 assets/fonts/               bundled Pretendard + license
-src/lib/i18n.js             locale helper
+src/lib/messages.js         UI string catalog (en / ko)
+src/lib/i18n.js             locale helper — auto / en / ko
 src/lib/icons.js            inline SVG (mark + lucide-style line icons)
 src/lib/font.js             registers the bundled font on document.fonts
 src/lib/defaults.js         default settings and color presets

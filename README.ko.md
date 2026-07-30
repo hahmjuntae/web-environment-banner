@@ -11,6 +11,7 @@
 - 환경마다 배경색·글자색 지정
 - 높이, 글자 크기, 흐르는 속도와 방향, 간격, 사선 패턴 조절
 - Shadow DOM 안에서만 렌더되므로 페이지 CSS와 섞이지 않음
+- 화면 언어는 영어·한국어 중에서 설정 화면에서 직접 선택
 - 데이터를 수집하지 않고 외부 통신도 하지 않음
 
 ## 설치
@@ -84,10 +85,11 @@
 
 ```
 manifest.json               MV3 매니페스트
-_locales/{en,ko}/           UI 문자열 (기본 로케일은 영어)
+_locales/{en,ko}/           스토어에 노출되는 이름·설명 (기본 로케일은 영어)
 assets/icon*.png            툴바·스토어 아이콘 (icon.svg / icon-small.svg 가 원본)
 assets/fonts/               번들된 Pretendard + 라이선스
-src/lib/i18n.js             로케일 헬퍼
+src/lib/messages.js         UI 문자열 카탈로그 (en / ko)
+src/lib/i18n.js             로케일 헬퍼 — 자동 / en / ko
 src/lib/icons.js            인라인 SVG (마크 + lucide 규격 라인 아이콘)
 src/lib/font.js             번들 폰트를 document.fonts 에 등록
 src/lib/defaults.js         기본 설정값, 색상 프리셋

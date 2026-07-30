@@ -15,6 +15,7 @@
   /* id → 값 종류. state.settings 의 키와 1:1 로 맞춰 둔다. */
   const SETTING_FIELDS = {
     enabled: 'bool',
+    locale: 'text',
     position: 'text',
     direction: 'text',
     height: 'number',
@@ -224,6 +225,28 @@
     }
   });
 
+  /* ── 언어 ─────────────────────────────── */
+  function fillLocaleOptions() {
+    const el = $('#locale');
+    el.textContent = '';
+    EnvBannerI18n.LOCALES.forEach((loc) => {
+      const opt = document.createElement('option');
+      opt.value = loc.value;
+      opt.textContent = loc.label || t(loc.labelKey, 'Auto');
+      el.appendChild(opt);
+    });
+    el.value = state.settings.locale;
+  }
+
+  /* 언어가 바뀌면 화면 전체를 다시 그린다 (카드 내부 라벨·placeholder 포함) */
+  function applyLocale() {
+    EnvBannerI18n.setLocale(state.settings.locale);
+    EnvBannerI18n.apply(document);
+    fillLocaleOptions();
+    renderEnvs();
+    updateTester();
+  }
+
   /* ── 배너 설정 ─────────────────────────── */
   function fillSettings() {
     Object.keys(SETTING_FIELDS).forEach((id) => {
@@ -250,6 +273,11 @@
         const kind = SETTING_FIELDS[id];
         state.settings[id] =
           kind === 'bool' ? el.checked : kind === 'number' ? Number(el.value) : el.value;
+        if (id === 'locale') {
+          applyLocale();
+          save();
+          return;
+        }
         syncOutputs();
         updateAllPreviews();
         save();
@@ -335,9 +363,11 @@
     EnvBannerFont.ensure();
     $('#mark').innerHTML = EnvBannerIcons.MARK;
     paintIcons(document);
-    EnvBannerI18n.apply(document);
 
     state = await EnvBannerStore.get();
+    EnvBannerI18n.setLocale(state.settings.locale);
+    EnvBannerI18n.apply(document);
+    fillLocaleOptions();
     fillSettings();
     bindSettings();
     renderEnvs();
@@ -349,6 +379,9 @@
       if (JSON.stringify(cfg) === lastSavedJson) return;
       if (envList.contains(document.activeElement)) return;
       state = cfg;
+      EnvBannerI18n.setLocale(state.settings.locale);
+      EnvBannerI18n.apply(document);
+      fillLocaleOptions();
       fillSettings();
       renderEnvs();
       updateTester();

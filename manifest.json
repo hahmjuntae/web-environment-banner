@@ -30,6 +30,7 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "js": [
+        "src/lib/messages.js",
         "src/lib/i18n.js",
         "src/lib/icons.js",
         "src/lib/font.js",
