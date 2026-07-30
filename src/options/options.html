@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web Environment Banner</title>
+<link rel="stylesheet" href="options.css">
+</head>
+<body>
+<div class="page">
+  <header class="page-title">
+    <div class="page-title-main">
+      <span class="mark" id="mark"></span>
+      <h1>Web Environment Banner</h1>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="enabled">
+      <span class="toggle-track"><span class="toggle-knob"></span></span>
+      <span class="toggle-label">사용</span>
+    </label>
+  </header>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>환경</h2>
+      <button type="button" id="addEnv" class="btn primary">
+        <span class="btn-icon" data-icon="plus"></span>환경 추가
+      </button>
+    </div>
+    <div id="envList" class="env-list"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>배너</h2></div>
+    <div class="field-grid">
+      <label class="field">
+        <span class="label">위치</span>
+        <span class="select">
+          <select id="position">
+            <option value="top">최상단</option>
+            <option value="bottom">최하단</option>
+          </select>
+          <span class="select-arrow" data-icon="chevronDown"></span>
+        </span>
+      </label>
+      <label class="field">
+        <span class="label">방향</span>
+        <span class="select">
+          <select id="direction">
+            <option value="left">왼쪽</option>
+            <option value="right">오른쪽</option>
+          </select>
+          <span class="select-arrow" data-icon="chevronDown"></span>
+        </span>
+      </label>
+      <label class="field">
+        <span class="label">높이 <output id="heightOut" class="mono"></output></span>
+        <input type="range" id="height" min="14" max="80" step="1">
+      </label>
+      <label class="field">
+        <span class="label">글자 <output id="fontSizeOut" class="mono"></output></span>
+        <input type="range" id="fontSize" min="8" max="32" step="1">
+      </label>
+      <label class="field">
+        <span class="label">속도 <output id="speedOut" class="mono"></output></span>
+        <input type="range" id="speed" min="5" max="300" step="5">
+      </label>
+      <label class="field">
+        <span class="label">간격 <output id="gapOut" class="mono"></output></span>
+        <input type="range" id="gap" min="4" max="160" step="2">
+      </label>
+    </div>
+    <div class="check-row">
+      <label class="check"><input type="checkbox" id="showWarning"><span>경고 아이콘</span></label>
+      <label class="check"><input type="checkbox" id="stripes"><span>사선 패턴</span></label>
+      <label class="check"><input type="checkbox" id="pushContent"><span>컨텐츠 밀어내기</span></label>
+      <label class="check"><input type="checkbox" id="offsetFixed"><span>고정 헤더 함께 내리기</span></label>
+      <label class="check"><input type="checkbox" id="pauseOnHover"><span>마우스 올리면 정지</span></label>
+      <label class="check"><input type="checkbox" id="dismissible"><span>닫기 버튼</span></label>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>URL 확인</h2></div>
+    <input type="text" id="tester" class="input mono" placeholder="https://dev.example.com/login" spellcheck="false">
+    <div id="testerResult" class="tester-result"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>설정 파일</h2></div>
+    <div class="btn-row">
+      <button type="button" id="exportBtn" class="btn"><span class="btn-icon" data-icon="download"></span>내보내기</button>
+      <button type="button" id="importBtn" class="btn"><span class="btn-icon" data-icon="upload"></span>가져오기</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <button type="button" id="resetBtn" class="btn danger"><span class="btn-icon" data-icon="rotate"></span>초기화</button>
+    </div>
+  </section>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<template id="envTemplate">
+  <article class="env reveal" data-id="">
+    <div class="env-head">
+      <label class="check"><input type="checkbox" data-f="enabled"></label>
+      <input type="text" class="input env-name" data-f="label" maxlength="40" placeholder="LOCAL">
+      <div class="env-actions">
+        <button type="button" class="icon-btn" data-act="up" data-icon="chevronUp" title="위로"></button>
+        <button type="button" class="icon-btn" data-act="down" data-icon="chevronDown" title="아래로"></button>
+        <button type="button" class="icon-btn danger" data-act="del" data-icon="trash" title="삭제"></button>
+      </div>
+    </div>
+
+    <div class="preview"><web-env-banner-preview data-role="preview"></web-env-banner-preview></div>
+
+    <div class="env-body">
+      <div class="env-color">
+        <span class="label">색</span>
+        <div class="color-row">
+          <input type="color" data-f="bg" title="배경">
+          <input type="color" data-f="fg" title="글자">
+          <div class="swatches" data-role="swatches"></div>
+        </div>
+      </div>
+      <label class="field">
+        <span class="label">URL 패턴</span>
+        <textarea class="input mono" data-f="patterns" rows="5" spellcheck="false"
+          placeholder="localhost:3000&#10;*.dev.example.com&#10;https://admin.example.com/*"></textarea>
+      </label>
+    </div>
+  </article>
+</template>
+
+<script src="../lib/icons.js"></script>
+<script src="../lib/font.js"></script>
+<script src="../lib/defaults.js"></script>
+<script src="../lib/match.js"></script>
+<script src="../lib/store.js"></script>
+<script src="../lib/banner.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>content script 하네스</title>
+<style>
+  body { margin: 0; background: #1d1d1d; color: #f5f5f5;
+    font: 14px/1.5 'Pretendard Variable', Pretendard, ui-sans-serif, system-ui, sans-serif; }
+  #siteHeader { position: fixed; top: 0; left: 0; right: 0; height: 44px;
+    background: #2e2e2e; color: #f5f5f5; display: flex; align-items: center; padding: 0 16px;
+    font-weight: 700; z-index: 10; }
+  main { padding: 60px 16px 24px; }
+  h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 16px; }
+  #result { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; white-space: pre; }
+  .pass { color: #34b27c; } .fail { color: #ec4860; font-weight: 700; }
+</style>
+</head>
+<body>
+<header id="siteHeader">사이트가 직접 띄운 fixed 헤더 — 배너만큼 내려가야 한다</header>
+<main>
+  <h1>content script 하네스</h1>
+  <div id="result">검사 중...</div>
+</main>
+
+<script>
+  // chrome API 스텁 — 실제 확장과 같은 코드 경로를 타게 한다
+  const CFG = {
+    settings: {
+      enabled: true, position: 'top', height: 30, fontSize: 12, speed: 55, direction: 'left',
+      gap: 28, showWarning: true, stripes: false,
+      pushContent: true, offsetFixed: true, pauseOnHover: true, dismissible: true
+    },
+    environments: [
+      { id: 'l', label: 'LOCAL', enabled: true, bg: '#34b27c', fg: '#0a0a0a', patterns: ['/^file:\\/\\//'] },
+      { id: 'p', label: 'PRODUCTION', enabled: true, bg: '#ec4860', fg: '#0a0a0a', patterns: ['example.com'] }
+    ]
+  };
+  window.chrome = {
+    runtime: { getURL: (p) => new URL('../' + p, location.href).href },
+    storage: {
+      sync: {
+        get: () => Promise.resolve({ envBannerConfig: CFG }),
+        set: () => Promise.resolve()
+      },
+      onChanged: { addListener() {}, removeListener() {} }
+    }
+  };
+</script>
+<script src="../src/lib/icons.js"></script>
+<script src="../src/lib/font.js"></script>
+<script src="../src/lib/defaults.js"></script>
+<script src="../src/lib/match.js"></script>
+<script src="../src/lib/store.js"></script>
+<script src="../src/lib/banner.js"></script>
+<script src="../src/content/content.js"></script>
+<script>
+  setTimeout(() => {
+    const lines = [];
+    let fail = 0;
+    const check = (name, cond, extra) => {
+      if (!cond) fail++;
+      lines.push(`${cond ? 'PASS' : 'FAIL'}  ${name}${extra ? '  → ' + extra : ''}`);
+    };
+
+    const host = document.querySelector('web-env-banner-root');
+    check('배너 host 삽입', !!host);
+    check('host 가 <html> 직속 (body transform 무관)',
+      !!host && host.parentElement === document.documentElement);
+
+    const sr = host && host.shadowRoot;
+    check('shadow root 생성', !!sr);
+
+    const bar = sr && sr.querySelector('.bar');
+    const items = sr ? sr.querySelectorAll('.item') : [];
+    check('반복 아이템 렌더', items.length >= 4, items.length + '개');
+
+    const groups = sr ? sr.querySelectorAll('.group') : [];
+    const gw = groups.length ? groups[0].getBoundingClientRect().width : 0;
+    check('그룹 폭 ≥ 뷰포트 폭 (빈틈 없음)', gw >= window.innerWidth,
+      Math.round(gw) + 'px vs ' + window.innerWidth + 'px');
+
+    const cs = host && getComputedStyle(host);
+    check('position fixed', cs && cs.position === 'fixed', cs && cs.position);
+    check('top 0', cs && cs.top === '0px', cs && cs.top);
+    check('높이 30px', cs && cs.height === '30px', cs && cs.height);
+    check('z-index 최대', cs && cs.zIndex === '2147483647', cs && cs.zIndex);
+
+    const barCs = bar && getComputedStyle(bar);
+    check('배경색 = LOCAL', barCs && barCs.backgroundColor === 'rgb(52, 178, 124)', barCs && barCs.backgroundColor);
+    check('radius 0', barCs && barCs.borderTopLeftRadius === '0px', barCs && barCs.borderTopLeftRadius);
+    check('라벨 텍스트', !!(sr && sr.querySelector('.label')) && sr.querySelector('.label').textContent === 'LOCAL');
+    check('경고 아이콘', !!(sr && sr.querySelector('.warn svg')));
+    check('회사 로고 없음', !(sr && sr.querySelector('.logo')));
+
+    const trackCs = sr && getComputedStyle(sr.querySelector('.track'));
+    check('애니메이션 동작', trackCs && trackCs.animationName === 'eb-roll', trackCs && trackCs.animationName);
+    check('duration 계산됨', trackCs && parseFloat(trackCs.animationDuration) > 1, trackCs && trackCs.animationDuration);
+
+    check('컨텐츠 밀어내기(html padding-top)',
+      document.documentElement.style.paddingTop === '30px', document.documentElement.style.paddingTop);
+
+    // 사이트 고정 헤더 보정
+    const siteHeader = document.getElementById('siteHeader');
+    const headerTop = getComputedStyle(siteHeader).top;
+    check('사이트 fixed 헤더가 배너만큼 내려감', headerTop === '30px', headerTop);
+    check('보정 마커 부착', siteHeader.hasAttribute('data-web-env-banner-offset'));
+
+    // 닫기 → 원복
+    const closeBtn = sr && sr.querySelector('.close');
+    check('닫기 버튼 표시', closeBtn && getComputedStyle(closeBtn).display !== 'none');
+    if (closeBtn) {
+      closeBtn.click();
+      check('닫기 후 host 제거', !document.querySelector('web-env-banner-root'));
+      check('닫기 후 padding 원복', document.documentElement.style.paddingTop === '',
+        JSON.stringify(document.documentElement.style.paddingTop));
+      check('닫기 후 헤더 top 원복', getComputedStyle(siteHeader).top === '0px',
+        getComputedStyle(siteHeader).top);
+      check('보정 마커 제거', !siteHeader.hasAttribute('data-web-env-banner-offset'));
+    }
+
+    const el = document.getElementById('result');
+    el.textContent = lines.join('\n') + '\n\n' + (fail ? `실패 ${fail}건` : '전체 통과');
+    el.className = fail ? 'fail' : 'pass';
+    document.title = fail ? `FAIL-${fail}` : 'ALL-PASS';
+  }, 800);
+</script>
+</body>
+</html>

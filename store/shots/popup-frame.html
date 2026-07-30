@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>popup frame</title>
+<link rel="stylesheet" href="../../src/popup/popup.css">
+<style>body { background: #1d1d1d; }</style>
+</head>
+<body>
+<div class="pop">
+  <header class="head">
+    <span class="mark" id="mark"></span>
+    <strong class="title">Web Environment Banner</strong>
+    <label class="toggle"><input type="checkbox" id="enabled">
+      <span class="toggle-track"><span class="toggle-knob"></span></span></label>
+  </header>
+  <div class="preview" id="previewFrame" hidden>
+    <web-env-banner-preview id="preview"></web-env-banner-preview>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="url mono" id="url"></div>
+  <div class="assign" id="assign" hidden>
+    <span class="select"><select id="patternSelect" class="mono"></select>
+      <span class="select-arrow" data-icon="chevronDown"></span></span>
+    <div class="assign-row">
+      <span class="select"><select id="envSelect"></select>
+        <span class="select-arrow" data-icon="chevronDown"></span></span>
+      <button type="button" id="addBtn" class="btn primary">
+        <span class="btn-icon" data-icon="plus"></span>추가</button>
+    </div>
+  </div>
+  <button type="button" id="openOptions" class="btn wide">
+    <span class="btn-icon" data-icon="sliders"></span>설정</button>
+</div>
+
+<script>
+  window.chrome = {
+    runtime: { getURL: (p) => new URL('../../' + p, location.href).href, openOptionsPage() {} },
+    tabs: { query: () => Promise.resolve([{ url: 'https://dev.acme-console.com/orders' }]) },
+    storage: {
+      sync: { get: () => Promise.resolve({}), set: () => Promise.resolve() },
+      onChanged: { addListener() {}, removeListener() {} }
+    }
+  };
+</script>
+<script src="../../src/lib/icons.js"></script>
+<script src="../../src/lib/font.js"></script>
+<script src="../../src/lib/defaults.js"></script>
+<script src="../../src/lib/match.js"></script>
+<script src="../../src/lib/store.js"></script>
+<script src="../../src/lib/banner.js"></script>
+<script src="../../src/popup/popup.js"></script>
+<script>
+  setTimeout(() => {
+    const sr = document.getElementById('preview').shadowRoot;
+    if (sr) sr.querySelector('.track').style.animationPlayState = 'paused';
+  }, 300);
+</script>
+</body>
+</html>

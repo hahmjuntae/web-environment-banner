@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>promo tile</title>
+<style>
+  @font-face {
+    font-family: 'Pretendard Variable';
+    src: url('../../assets/fonts/PretendardVariable.woff2') format('woff2');
+    font-weight: 400 900; font-display: block;
+  }
+  * { box-sizing: border-box; margin: 0; border-radius: 0; }
+  html, body { width: 440px; height: 280px; overflow: hidden; }
+  body {
+    background: #0a0a0a; color: #f5f5f5;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+    display: flex; flex-direction: column; justify-content: center; gap: 18px;
+    padding: 0 32px; -webkit-font-smoothing: antialiased;
+  }
+  .top { display: flex; align-items: center; gap: 12px; }
+  .mark { width: 28px; height: 28px; display: inline-flex; flex: none; }
+  .mark svg { width: 100%; height: 100%; }
+  .name { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; }
+  .frame { border: 1px solid #2e2e2e; overflow: hidden; }
+  .tag { font-size: 12px; font-weight: 500; letter-spacing: 0.025em; color: #9e9e9e; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <span class="mark" id="mark"></span>
+    <span class="name">Web Environment Banner</span>
+  </div>
+  <div class="frame" id="frame"></div>
+  <div class="tag">로컬 · 개발 · 운영을 한눈에</div>
+
+<script src="../../src/lib/icons.js"></script>
+<script src="../../src/lib/defaults.js"></script>
+<script src="../../src/lib/banner.js"></script>
+<script>
+  document.getElementById('mark').innerHTML = EnvBannerIcons.MARK;
+  const holder = document.createElement('web-env-banner-preview');
+  document.getElementById('frame').appendChild(holder);
+  EnvBannerUI.mount(holder, {
+    env: { id: 'p', label: 'PRODUCTION', bg: '#ec4860', fg: '#0a0a0a', enabled: true, patterns: [] },
+    settings: Object.assign({}, EnvBannerDefaults.DEFAULT_SETTINGS),
+    mode: 'inline'
+  });
+  holder.shadowRoot.querySelector('.track').style.animationPlayState = 'paused';
+</script>
+</body>
+</html>

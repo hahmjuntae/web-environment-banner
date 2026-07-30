@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>shot1</title>
+<style>
+  /* 스토어 스크린샷용 가짜 사이트 — 실제 어드민처럼 보이게 만든 배경 */
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1280px; height: 800px; overflow: hidden; }
+  body {
+    background: #f4f5f7;
+    color: #1f2430;
+    font: 14px/1.5 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+  }
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 56px; z-index: 50;
+    background: #fff; border-bottom: 1px solid #e3e6ea;
+    display: flex; align-items: center; gap: 20px; padding: 0 24px;
+  }
+  .brand { font-weight: 800; font-size: 15px; letter-spacing: -0.01em; }
+  .brand span { color: #8a91a0; font-weight: 500; }
+  .search {
+    flex: 1; max-width: 380px; height: 34px; border: 1px solid #e3e6ea;
+    border-radius: 6px; background: #f7f8fa; display: flex; align-items: center;
+    padding: 0 12px; color: #9aa1ae; font-size: 13px;
+  }
+  .avatar { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; background: #cdd3dc; }
+  .shell { display: flex; padding-top: 56px; height: 800px; }
+  .side { width: 210px; background: #fff; border-right: 1px solid #e3e6ea; padding: 16px 12px; }
+  .side h4 { font-size: 11px; color: #9aa1ae; font-weight: 600; letter-spacing: .04em; padding: 8px 10px; }
+  .side a {
+    display: block; padding: 9px 10px; border-radius: 6px; color: #414a5a;
+    text-decoration: none; font-size: 13.5px; font-weight: 500;
+  }
+  .side a.on { background: #eef1f5; color: #1f2430; font-weight: 700; }
+  main { flex: 1; padding: 24px 28px; }
+  h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+  .sub { color: #7d8494; font-size: 13px; margin-top: 4px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 0 22px; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 8px; padding: 14px 16px; }
+  .card .k { font-size: 11.5px; color: #8a91a0; font-weight: 600; letter-spacing: .03em; }
+  .card .v { font-size: 22px; font-weight: 800; margin-top: 6px; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums; }
+  table { width: 100%; background: #fff; border: 1px solid #e3e6ea; border-radius: 8px;
+    border-collapse: separate; border-spacing: 0; overflow: hidden; }
+  th, td { text-align: left; padding: 11px 16px; font-size: 13px; white-space: nowrap; }
+  th { background: #fafbfc; color: #7d8494; font-size: 11.5px; font-weight: 600;
+    letter-spacing: .03em; border-bottom: 1px solid #e3e6ea; }
+  td { border-bottom: 1px solid #eef0f3; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: 0; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .ok { background: #e6f6ee; color: #10794f; }
+  .wait { background: #fdf1dc; color: #9a6600; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Acme <span>Console</span></div>
+  <div class="search">주문번호, 고객명 검색</div>
+  <div class="avatar"></div>
+</header>
+
+<div class="shell">
+  <nav class="side">
+    <h4>운영</h4>
+    <a class="on">주문 관리</a>
+    <a>정산</a>
+    <a>고객</a>
+    <a>상품</a>
+    <h4>설정</h4>
+    <a>권한</a>
+    <a>알림</a>
+  </nav>
+  <main>
+    <h1>주문 관리</h1>
+    <div class="sub">최근 30일 · 총 12,480건</div>
+
+    <div class="cards">
+      <div class="card"><div class="k">오늘 주문</div><div class="v">1,204</div></div>
+      <div class="card"><div class="k">결제 대기</div><div class="v">37</div></div>
+      <div class="card"><div class="k">환불 요청</div><div class="v">12</div></div>
+      <div class="card"><div class="k">매출</div><div class="v">84,120,000</div></div>
+    </div>
+
+    <table>
+      <thead><tr><th>주문번호</th><th>고객</th><th>금액</th><th>상태</th><th>결제일</th></tr></thead>
+      <tbody>
+        <tr><td>ORD-99341</td><td>김민준</td><td>128,000</td><td><span class="pill ok">결제완료</span></td><td>2026-07-30 14:02</td></tr>
+        <tr><td>ORD-99340</td><td>이서연</td><td>54,900</td><td><span class="pill wait">결제대기</span></td><td>2026-07-30 13:58</td></tr>
+        <tr><td>ORD-99339</td><td>박지호</td><td>312,000</td><td><span class="pill ok">결제완료</span></td><td>2026-07-30 13:41</td></tr>
+        <tr><td>ORD-99338</td><td>최수아</td><td>21,500</td><td><span class="pill ok">결제완료</span></td><td>2026-07-30 13:30</td></tr>
+        <tr><td>ORD-99337</td><td>정하윤</td><td>76,400</td><td><span class="pill ok">결제완료</span></td><td>2026-07-30 13:12</td></tr>
+      </tbody>
+    </table>
+  </main>
+</div>
+
+<script src="../../src/lib/icons.js"></script>
+<script src="../../src/lib/defaults.js"></script>
+<script src="../../src/lib/banner.js"></script>
+<script>
+  (function () {
+    const settings = Object.assign({}, EnvBannerDefaults.DEFAULT_SETTINGS);
+    const env = { id: 'p', label: 'PRODUCTION', enabled: true, bg: '#ec4860', fg: '#0a0a0a', patterns: [] };
+
+    const host = document.createElement('web-env-banner-root');
+    document.documentElement.appendChild(host);
+    EnvBannerUI.mount(host, { env, settings, mode: 'fixed' });
+
+    // 컨텐츠·고정 헤더를 배너만큼 내린다 (content script 와 같은 결과)
+    document.documentElement.style.setProperty('padding-top', settings.height + 'px', 'important');
+    document.querySelector('.topbar').style.setProperty('top', settings.height + 'px', 'important');
+
+    // 스크린샷은 정렬된 프레임에서 찍는다
+    host.shadowRoot.querySelector('.track').style.animationPlayState = 'paused';
+  })();
+</script>
+</body>
+</html>

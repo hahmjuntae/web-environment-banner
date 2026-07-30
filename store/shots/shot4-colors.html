@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>shot4</title>
+<style>
+  @font-face {
+    font-family: 'Pretendard Variable';
+    src: url('../../assets/fonts/PretendardVariable.woff2') format('woff2');
+    font-weight: 400 900; font-display: block;
+  }
+  * { box-sizing: border-box; margin: 0; border-radius: 0; }
+  html, body { width: 1280px; height: 800px; overflow: hidden; }
+  body {
+    background: #1d1d1d; color: #f5f5f5;
+    font: 14px/1.45 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 88px; word-break: keep-all; -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+  p.lead { color: #9e9e9e; font-size: 17px; margin-top: 14px; }
+  .list { margin-top: 52px; display: flex; flex-direction: column; gap: 28px; }
+  .item { display: flex; flex-direction: column; gap: 10px; }
+  .cap { font-size: 12px; font-weight: 500; letter-spacing: 0.025em; color: #9e9e9e; }
+  .frame { border: 1px solid #2e2e2e; overflow: hidden; }
+</style>
+</head>
+<body>
+  <h1>운영 서버를 개발 서버로<br>착각하지 않도록</h1>
+  <p class="lead">등록한 주소에 접속하면 페이지 최상단에 환경 배너가 뜹니다. 색과 이름은 환경마다 지정합니다.</p>
+
+  <div class="list" id="list"></div>
+
+<script src="../../src/lib/icons.js"></script>
+<script src="../../src/lib/defaults.js"></script>
+<script src="../../src/lib/banner.js"></script>
+<script>
+  (function () {
+    const list = document.getElementById('list');
+    const settings = Object.assign({}, EnvBannerDefaults.DEFAULT_SETTINGS);
+
+    const rows = [
+      ['localhost:3000', { id: 'l', label: 'LOCAL', bg: '#34b27c', fg: '#0a0a0a', enabled: true, patterns: [] }],
+      ['dev.acme-console.com', { id: 'd', label: 'DEVELOPMENT', bg: '#f5a312', fg: '#0a0a0a', enabled: true, patterns: [] }],
+      ['acme-console.com', { id: 'p', label: 'PRODUCTION', bg: '#ec4860', fg: '#0a0a0a', enabled: true, patterns: [] }]
+    ];
+
+    rows.forEach(([caption, env]) => {
+      const item = document.createElement('div');
+      item.className = 'item';
+      const cap = document.createElement('div');
+      cap.className = 'cap';
+      cap.textContent = caption;
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+      const holder = document.createElement('web-env-banner-preview');
+      frame.appendChild(holder);
+      item.append(cap, frame);
+      list.appendChild(item);
+      EnvBannerUI.mount(holder, { env, settings, mode: 'inline' });
+      holder.shadowRoot.querySelector('.track').style.animationPlayState = 'paused';
+    });
+  })();
+</script>
+</body>
+</html>
