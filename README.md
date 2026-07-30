@@ -16,13 +16,15 @@ so you never mistake production for development.
 
 ## Install
 
-Not on the Chrome Web Store yet. To load it locally:
+Grab the ZIP from the [latest release](https://github.com/hahmjuntae/web-environment-banner/releases/latest)
+and unzip it, then:
 
 1. Open `chrome://extensions`
 2. Turn on **Developer mode**
-3. **Load unpacked** → select this folder
+3. **Load unpacked** → select the unzipped folder
 
 Defaults are ready to go — open `http://localhost:3000` and the banner appears.
+Requires Chrome 88 or newer.
 
 | Environment | Color | Default patterns |
 |---|---|---|
