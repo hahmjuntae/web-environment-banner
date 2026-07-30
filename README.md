@@ -109,7 +109,6 @@ bash store/package.sh      # build dist/ ZIP (validates manifest, syntax, locale
 bash store/make-assets.sh  # regenerate store screenshots and promo tile
 ```
 
-Publishing steps and the exact dashboard copy live in [PUBLISHING.md](PUBLISHING.md).
 Privacy policy: [PRIVACY.md](PRIVACY.md).
 
 ## Design

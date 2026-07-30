@@ -107,7 +107,6 @@ bash store/package.sh      # dist/ ZIP 생성 (manifest·문법·로케일 검�
 bash store/make-assets.sh  # 스토어 스크린샷·프로모 타일 재생성
 ```
 
-배포 절차와 대시보드 입력 문구는 [PUBLISHING.md](PUBLISHING.md)에 있습니다.
 개인정보 처리방침은 [PRIVACY.md](PRIVACY.md)입니다.
 
 ## 디자인
