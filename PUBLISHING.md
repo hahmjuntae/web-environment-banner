@@ -240,18 +240,77 @@ Used only when the user opens the toolbar popup, to show the current tab's URL a
 register it with one click. Page content is never read.
 ```
 
-**호스트 권한 (`<all_urls>`)**
+**호스트 권한 (`http://*/*`, `https://*/*`)**
+
+> 제출 시 "광범위한 호스트 권한" 지연 경고가 뜹니다. 아래 문구는 그 경고가 제안하는 두 대안
+> (`activeTab` 전환 / 사이트 지정)을 왜 적용할 수 없는지까지 답하도록 작성했습니다. **이 내용을 빼면
+> 심사가 더 길어지거나 거절될 수 있습니다.**
+
 ```
-사용자는 어떤 주소든 환경으로 등록할 수 있으므로, 배너를 그릴 대상 사이트를 개발자가 미리 특정할 수 없습니다.
-그래서 모든 사이트에서 실행되는 content script 가 필요합니다. 다만 실제로 하는 일은 현재 주소가 사용자가
-등록한 패턴과 일치하는지 기기 안에서 비교하고, 일치할 때 배너 요소를 추가하는 것뿐입니다. 페이지의 내용·입력값·
-쿠키·토큰을 읽지 않고, 어떤 데이터도 외부로 보내지 않습니다.
+이 확장의 기능은 "사용자가 등록한 주소에 접속하면 그 페이지에 환경 배너를 자동으로 표시하는 것"입니다.
+페이지가 열리는 시점에 배너가 떠 있어야 목적(운영 서버를 개발 서버로 착각하는 것을 막는 것)이 달성되므로,
+사용자가 등록한 주소라면 어디서든 실행될 수 있는 content script 가 필요합니다.
+
+권장 대안을 검토했으나 적용할 수 없었습니다.
+
+1) activeTab: 이미 선언해 두었고 툴바 팝업에서만 사용합니다. 다만 activeTab 은 사용자가 확장 아이콘을
+   클릭한 시점에만 유효하므로, 페이지 로드 시 자동으로 배너를 띄우는 이 확장의 핵심 동작을 대체할 수
+   없습니다. 매번 아이콘을 눌러야 한다면 착각을 막는 기능이 성립하지 않습니다.
+
+2) host_permissions 로 사이트 지정: 대상 사이트는 개발자가 아니라 사용자가 정하며, 설치 시점에는 알 수
+   없습니다. 또한 이 확장은 dev.*, dev-*, *-local.*, 정규식 같은 패턴 문법을 제공하는데, 이는 Chrome
+   match pattern 으로 표현할 수 없습니다(match pattern 은 호스트 앞의 *. 만 허용). 따라서 사용자가 입력한
+   패턴을 host_permissions 목록으로 변환하는 것이 불가능합니다.
+
+범위는 최소화했습니다. <all_urls> 대신 http://*/* 와 https://*/* 만 요청하며 file://, ftp:// 등은
+제외했습니다. iframe 에는 주입하지 않습니다(all_frames: false).
+
+content script 가 실제로 하는 일은 두 가지뿐입니다.
+- location.href 를 사용자가 저장한 패턴과 기기 내에서 문자열 비교
+- 일치하면 Shadow DOM 배너 요소를 추가하고, 배너에 가려지는 상단 고정 요소의 top 값을 보정
+
+페이지의 DOM 내용, 입력값, 쿠키, 토큰, localStorage 를 읽지 않습니다. 네트워크 요청을 전혀 하지 않으며
+(외부 통신 코드가 없습니다), 어떤 데이터도 기기를 떠나지 않습니다. 원격 코드도 사용하지 않고 폰트까지
+패키지에 포함했습니다.
+
+전체 소스가 공개되어 있어 위 내용을 직접 확인하실 수 있습니다.
+https://github.com/hahmjuntae/web-environment-banner
+content script: src/content/content.js · 패턴 매칭: src/lib/match.js
 ```
+
 ```
-Users may register any URL as an environment, so the set of sites cannot be known in advance; a
-content script on all sites is required. The script only compares the current URL against the
-user's own patterns locally and, on a match, injects the banner element. It never reads page
-content, form values, cookies, or tokens, and sends no data anywhere.
+The extension's purpose is to automatically display an environment banner on pages whose URL the
+user registered. The banner must already be visible when the page loads — that is the entire point
+(preventing a developer from mistaking production for development) — so a content script that can
+run on any user-registered address is required.
+
+We evaluated both recommended alternatives and neither is applicable.
+
+1) activeTab: already declared, and used only by the toolbar popup. However activeTab grants access
+   only at the moment the user clicks the extension icon, so it cannot replace the core behavior of
+   showing the banner on page load. Requiring a click every time would defeat the feature.
+
+2) Specifying sites via host_permissions: the target sites are chosen by the user, not the
+   developer, and are unknown at install time. Furthermore this extension offers pattern syntax such
+   as dev.*, dev-*, *-local.*, and regular expressions, which cannot be expressed as Chrome match
+   patterns (match patterns only allow a leading *. for subdomains). Converting user-entered
+   patterns into a host_permissions list is therefore not possible.
+
+The scope is minimized: instead of <all_urls> we request only http://*/* and https://*/*, excluding
+file:// and ftp://. The script is not injected into iframes (all_frames: false).
+
+The content script does exactly two things:
+- compares location.href against the user's stored patterns, locally, as string matching
+- on a match, appends a Shadow DOM banner element and offsets the `top` of fixed elements the banner
+  would cover
+
+It never reads page DOM content, form values, cookies, tokens, or localStorage. It makes no network
+requests at all (there is no outbound networking code), and no data ever leaves the device. No remote
+code is used; even the font is bundled.
+
+The full source is public so the above can be verified directly:
+https://github.com/hahmjuntae/web-environment-banner
+content script: src/content/content.js · pattern matching: src/lib/match.js
 ```
 
 ### 원격 코드 사용 여부
@@ -293,9 +352,29 @@ content, form values, cookies, or tokens, and sends no data anywhere.
 2. 우측 상단 **검토를 위해 제출** (Submit for review)
 3. "게시 방식"은 보통 **심사 통과 후 즉시 게시**를 선택
 
+### "게시가 지연됩니다 — 광범위한 호스트 권한" 경고
+
+제출 화면에 이 경고가 뜨는 것은 **정상이며 거절이 아닙니다.** 그대로 제출할 수 있습니다.
+
+이 확장은 구조적으로 광범위한 호스트 권한이 필요합니다(사용자가 대상 주소를 정하고, 제공하는 패턴 문법이
+Chrome match pattern 으로 표현되지 않음). 6번의 정당화 문구가 그 이유를 설명합니다.
+
+지금 적용된 완화 조치:
+
+| 조치 | 내용 |
+|---|---|
+| scheme 축소 | `<all_urls>` → `http://*/*` + `https://*/*` (file·ftp 제외) |
+| 프레임 제한 | `all_frames: false` — iframe 에 주입하지 않음 |
+| 원격 코드 없음 | JS·CSS·폰트 전부 패키지 내장 |
+| 네트워크 없음 | 외부 통신 코드가 존재하지 않음 |
+| 소스 공개 | 심사자가 코드를 직접 확인 가능 |
+
+권한 경고 자체는 사라지지 않습니다(모든 http/https 사이트를 여전히 포함하므로). 다만 위 근거가 갖춰지면
+심사는 통과됩니다.
+
 ### 소요 시간
 - 대부분 **1~3일**
-- 모든 사이트 접근 권한(`<all_urls>`)이 있으면 심사가 더 오래 걸릴 수 있습니다 (최대 수 주)
+- 광범위한 호스트 권한 때문에 이 확장은 더 오래 걸릴 수 있습니다 (길면 수 주)
 - 첫 등록은 재심사보다 오래 걸리는 편입니다
 
 ---
@@ -306,7 +385,7 @@ content, form values, cookies, or tokens, and sends no data anywhere.
 
 | 사유 | 대응 |
 |---|---|
-| 광범위한 호스트 권한의 정당성 부족 | 6번의 `<all_urls>` 정당화 문구를 그대로 넣었는지 확인. "사용자가 임의 URL을 등록하므로 대상을 미리 특정할 수 없다"가 핵심 논거입니다 |
+| 광범위한 호스트 권한의 정당성 부족 | 6번의 호스트 권한 정당화 문구를 **전문 그대로** 넣었는지 확인. `activeTab`·`host_permissions` 두 대안을 왜 못 쓰는지 답하는 부분이 핵심입니다 |
 | 개인정보 처리방침 접근 불가 | Secret gist·로그인 필요 페이지가 아닌지 확인. 시크릿 창에서 URL이 열리는지 테스트 |
 | 단일 목적 위반 | 기능을 추가할 때 "환경 표시"와 무관한 것(예: 페이지 내용 수정, 통계 수집)을 넣지 않기 |
 | 스크린샷 품질 | 1280×800 정확히, 흐릿하거나 텍스트가 잘리지 않게. 제공된 4장은 이 기준을 만족합니다 |

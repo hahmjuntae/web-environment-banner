@@ -37,8 +37,9 @@
     return el;
   }
 
+  /* manifest 의 content_scripts matches 와 일치해야 한다 */
   function isInjectable(url) {
-    return /^https?:\/\//i.test(url) || /^file:\/\//i.test(url);
+    return /^https?:\/\//i.test(url);
   }
 
   function render() {
