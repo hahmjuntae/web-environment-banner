@@ -9,7 +9,7 @@ so you never mistake production for development.
 
 - Register URLs per environment: local / development / production, plus anything you add
 - Pick a background and text color per environment
-- Tune height, font size, scroll speed and direction, spacing, diagonal stripes
+- Tune height, font size, scroll speed (`0` stops the banner) and direction, spacing, diagonal stripes
 - Rendered inside a Shadow DOM, so it never collides with the page's CSS
 - Interface in English and Korean, switchable in the settings screen
 - Collects no data and makes no network requests

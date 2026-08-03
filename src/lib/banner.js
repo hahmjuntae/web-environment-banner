@@ -63,6 +63,7 @@
 }
 .bar[data-dir="right"] .track { animation-direction: reverse; }
 .bar[data-hoverpause="1"]:hover .track { animation-play-state: paused; }
+.bar[data-motion="0"] .track { animation: none; }
 @keyframes eb-roll {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-50%, 0, 0); }
@@ -192,6 +193,7 @@
       bar.dataset.pos = settings.position;
       bar.dataset.dir = settings.direction;
       bar.dataset.stripes = settings.stripes ? '1' : '0';
+      bar.dataset.motion = Number(settings.speed) > 0 ? '1' : '0';
       bar.dataset.hoverpause = settings.pauseOnHover ? '1' : '0';
       bar.dataset.close = mode === 'fixed' && settings.dismissible ? '1' : '0';
     }
@@ -212,7 +214,9 @@
       groups[1].innerHTML = html;
 
       const groupWidth = groups[0].getBoundingClientRect().width || unit * count;
-      const duration = groupWidth / Math.max(5, settings.speed);
+      // 속도 0 은 정지 — data-motion 으로 애니메이션을 끄므로 시간값은 형태만 유지한다
+      const speed = Number(settings.speed) > 0 ? Number(settings.speed) : 1;
+      const duration = groupWidth / speed;
       bar.style.setProperty('--eb-dur', duration.toFixed(2) + 's');
     }
 

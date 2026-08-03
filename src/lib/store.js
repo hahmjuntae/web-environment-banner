@@ -62,7 +62,7 @@
     settings.direction = settings.direction === 'right' ? 'right' : 'left';
     settings.height = clampNumber(settings.height, 14, 80, D.DEFAULT_SETTINGS.height);
     settings.fontSize = clampNumber(settings.fontSize, 8, 32, D.DEFAULT_SETTINGS.fontSize);
-    settings.speed = clampNumber(settings.speed, 5, 400, D.DEFAULT_SETTINGS.speed);
+    settings.speed = clampNumber(settings.speed, 0, 400, D.DEFAULT_SETTINGS.speed);
     settings.gap = clampNumber(settings.gap, 4, 160, D.DEFAULT_SETTINGS.gap);
     BOOL_KEYS.forEach((k) => {
       settings[k] = settings[k] !== false;
