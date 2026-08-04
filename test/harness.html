@@ -24,6 +24,8 @@
 
 <script>
   // chrome API 스텁 — 실제 확장과 같은 코드 경로를 타게 한다
+  // 앞선 하네스가 남긴 '이 탭에서 숨김' 상태를 지우고 시작한다
+  try { sessionStorage.removeItem('__webEnvBannerDismissed'); } catch (_) {}
   const CFG = {
     settings: {
       enabled: true, position: 'top', height: 30, fontSize: 12, speed: 55, direction: 'left',
@@ -31,7 +33,8 @@
       pushContent: true, offsetFixed: true, pauseOnHover: true, dismissible: true
     },
     environments: [
-      { id: 'l', label: 'LOCAL', enabled: true, bg: '#34b27c', fg: '#0a0a0a', patterns: ['/^file:\\/\\//'] },
+      { id: 'l', label: 'LOCAL', enabled: true, bg: '#34b27c', fg: '#0a0a0a',
+        patterns: ['localhost', '127.0.0.1', '/^file:\\/\\//'] },
       { id: 'p', label: 'PRODUCTION', enabled: true, bg: '#ec4860', fg: '#0a0a0a', patterns: ['example.com'] }
     ]
   };
@@ -98,8 +101,9 @@
     check('애니메이션 동작', trackCs && trackCs.animationName === 'eb-roll', trackCs && trackCs.animationName);
     check('duration 계산됨', trackCs && parseFloat(trackCs.animationDuration) > 1, trackCs && trackCs.animationDuration);
 
-    check('컨텐츠 밀어내기(html padding-top)',
-      document.documentElement.style.paddingTop === '30px', document.documentElement.style.paddingTop);
+    const htmlPad = () => getComputedStyle(document.documentElement).paddingTop;
+    check('컨텐츠 밀어내기(html padding-top)', htmlPad() === '30px', htmlPad());
+    check('밀어내기 스타일 주입', !!document.getElementById('web-env-banner-push'));
 
     // 사이트 고정 헤더 보정
     const siteHeader = document.getElementById('siteHeader');
@@ -113,8 +117,8 @@
     if (closeBtn) {
       closeBtn.click();
       check('닫기 후 host 제거', !document.querySelector('web-env-banner-root'));
-      check('닫기 후 padding 원복', document.documentElement.style.paddingTop === '',
-        JSON.stringify(document.documentElement.style.paddingTop));
+      check('닫기 후 padding 원복', htmlPad() === '0px', htmlPad());
+      check('닫기 후 주입 스타일 제거', !document.getElementById('web-env-banner-push'));
       check('닫기 후 헤더 top 원복', getComputedStyle(siteHeader).top === '0px',
         getComputedStyle(siteHeader).top);
       check('보정 마커 제거', !siteHeader.hasAttribute('data-web-env-banner-offset'));

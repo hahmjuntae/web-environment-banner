@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>실제 확장 검증</title>
+<style>
+  body { margin: 0; background: #1d1d1d; color: #f5f5f5;
+    font: 14px/1.5 ui-sans-serif, system-ui, sans-serif; }
+  .siteHeader { position: fixed; top: 0; left: 0; right: 0; height: 44px;
+    background: #2e2e2e; display: flex; align-items: center; padding: 0 16px;
+    font-weight: 700; z-index: 10; }
+  main { padding: 70px 16px 24px; }
+  #result { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; white-space: pre; }
+  .pass { color: #34b27c; } .fail { color: #ec4860; font-weight: 700; }
+</style>
+</head>
+<body>
+<header class="siteHeader" id="h1">사이트 fixed 헤더</header>
+<main>
+  <h1>실제 확장 검증 (스텁 없음)</h1>
+  <p>확장이 설치돼 있어야 검사가 진행된다. 배너 높이는 현재 설정값을 그대로 읽는다.</p>
+  <div id="result">검사 중...</div>
+</main>
+<script>
+  const lines = [];
+  let fail = 0;
+  const check = (name, cond, extra) => {
+    if (!cond) fail++;
+    lines.push(`${cond ? 'PASS' : 'FAIL'}  ${name}${extra ? '  → ' + extra : ''}`);
+  };
+  const flush = () => {
+    const el = document.getElementById('result');
+    el.textContent = lines.join('\n') + '\n\n' + (fail ? `실패 ${fail}건` : '전체 통과');
+    el.className = fail ? 'fail' : 'pass';
+    document.title = fail ? `FAIL-${fail}` : 'ALL-PASS';
+  };
+  const pad = () => getComputedStyle(document.documentElement).paddingTop;
+  const topOf = (id) => {
+    const el = document.getElementById(id);
+    return el ? getComputedStyle(el).top : '(없음)';
+  };
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  (async () => {
+    await wait(1200);
+    const banner = document.querySelector('web-env-banner-root');
+    if (!banner) {
+      document.getElementById('result').textContent =
+        '확장 배너가 없다 — 확장이 설치·활성화되지 않았거나 이 URL 이 어떤 환경 패턴에도 걸리지 않는다.';
+      document.title = 'NO-EXTENSION';
+      return;
+    }
+    const H = Math.round(banner.getBoundingClientRect().height);
+    const HPX = H + 'px';
+    lines.push(`# 배너 높이 ${HPX} (현재 설정값)`);
+
+    lines.push('# 1. 초기 렌더');
+    check('html padding-top', pad() === HPX, pad());
+    check('사이트 헤더 top', topOf('h1') === HPX, topOf('h1'));
+
+    lines.push('# 2. 헤더 인라인 스타일 재설정 (리렌더)');
+    document.getElementById('h1').style.top = '0px';
+    await wait(1400);
+    check('헤더 top 재보정', topOf('h1') === HPX, topOf('h1'));
+
+    lines.push('# 3. html 인라인 스타일 리셋');
+    document.documentElement.removeAttribute('style');
+    await wait(1400);
+    check('html padding-top 복구', pad() === HPX, pad());
+
+    lines.push('# 4. SPA 라우팅(pushState) + 헤더 교체');
+    document.getElementById('h1').remove();
+    const h2 = document.createElement('header');
+    h2.className = 'siteHeader';
+    h2.id = 'h2';
+    h2.textContent = '라우팅 후 새 헤더';
+    document.body.insertBefore(h2, document.body.firstChild);
+    history.pushState({}, '', '?page=2');
+    await wait(500);
+    check('교체된 헤더 top (500ms 내)', topOf('h2') === HPX, topOf('h2'));
+    check('html padding-top 유지', pad() === HPX, pad());
+
+    lines.push('# 5. html style 통째 덮어쓰기 (cssText)');
+    document.documentElement.style.cssText = 'background: #1d1d1d';
+    await wait(1400);
+    check('html padding-top 복구', pad() === HPX, pad());
+
+    lines.push('# 6. 사이트가 100ms 마다 top 을 0 으로 되돌림');
+    let races = 0;
+    const racer = setInterval(() => {
+      h2.style.top = '0px';
+      if (++races >= 12) clearInterval(racer);
+    }, 100);
+    await wait(2600);
+    check('경합 후 헤더 top 수렴', topOf('h2') === HPX, topOf('h2'));
+
+    flush();
+  })();
+</script>
+</body>
+</html>

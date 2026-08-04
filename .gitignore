@@ -4,3 +4,6 @@
 dist/
 PUBLISHING.md
 
+# 브라우저 자동화 로그·스냅샷
+.playwright-mcp/
+
