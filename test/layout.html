@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>레이아웃별 밀어내기 확인</title>
+<style>
+  body { margin: 0; background: #1d1d1d; color: #f5f5f5;
+    font: 14px/1.5 ui-sans-serif, system-ui, sans-serif; }
+  #topmark { height: 24px; background: #34b27c; color: #0a0a0a; font-weight: 700;
+    display: flex; align-items: center; padding: 0 12px; }
+  .box { height: 400px; background: #2e2e2e; margin: 12px; }
+
+  /* body 자체가 뷰포트를 채우는 스크롤 컨테이너 */
+  html.k-fixed-body body { position: fixed; inset: 0; overflow: auto; }
+
+  /* 앱 셸이 뷰포트를 채우는 fixed 컨테이너 */
+  html.k-fixed-root #root { position: fixed; inset: 0; overflow: auto; }
+
+  /* html·body 는 잠그고 앱 셸만 스크롤 */
+  html.k-vh-root, html.k-vh-root body { height: 100%; overflow: hidden; }
+  html.k-vh-root #root { height: 100%; overflow: auto; }
+
+  /* 상단 헤더가 absolute */
+  html.k-abs-header #absHeader { position: absolute; top: 0; left: 0; right: 0;
+    height: 44px; background: #3d8bf5; color: #0a0a0a; display: flex;
+    align-items: center; padding: 0 12px; font-weight: 700; }
+
+  /* 사이트가 html 여백을 강제로 0 으로 못박은 경우 */
+  html.k-pad-important { padding-top: 0 !important; padding-bottom: 0 !important; }
+
+  /* 전면 오버레이 — 모달로 표시된 것은 건드리지 않아야 한다 */
+  #overlay { position: fixed; inset: 0; background: rgba(10,10,10,.7);
+    display: flex; align-items: center; justify-content: center; }
+  html:not(.k-modal):not(.k-overlay) #overlay { display: none; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="absHeader" hidden>absolute 헤더</div>
+  <div id="topmark">최상단 마커 — 배너 아래로 내려가야 한다</div>
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box" id="lastBox"></div>
+</div>
+<div id="overlay"><strong>전면 오버레이</strong></div>
+<script>
+  const kind = new URLSearchParams(location.search).get('kind') || 'normal';
+  document.documentElement.classList.add('k-' + kind);
+  document.title = 'layout:' + kind;
+  if (kind === 'abs-header') document.getElementById('absHeader').hidden = false;
+  if (kind === 'modal') {
+    const o = document.getElementById('overlay');
+    o.setAttribute('role', 'dialog');
+    o.setAttribute('aria-modal', 'true');
+  }
+</script>
+</body>
+</html>

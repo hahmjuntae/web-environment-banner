@@ -70,7 +70,7 @@
     popAdd: 'Add',
     popSettings: 'Settings',
 
-    bannerHideTitle: 'Hide on this tab',
+    bannerHideTitle: 'Hide on this page (comes back on reload)',
     bannerHideLabel: 'Hide'
   };
 
@@ -134,7 +134,7 @@
     popAdd: '추가',
     popSettings: '설정',
 
-    bannerHideTitle: '이 탭에서 숨기기',
+    bannerHideTitle: '이 페이지에서 숨기기 (새로고침하면 다시 나옴)',
     bannerHideLabel: '숨기기'
   };
 

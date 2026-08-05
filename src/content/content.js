@@ -7,7 +7,6 @@
 
   const TAG = 'web-env-banner-root';
   const PUSH_STYLE_ID = 'web-env-banner-push';
-  const DISMISS_KEY = '__webEnvBannerDismissed';
   const OFFSET_MARK = 'data-web-env-banner-offset';
   const PUSH_PROPS = ['padding-top', 'padding-bottom'];
 
@@ -30,21 +29,11 @@
   /* 고정 요소의 원래 인라인 값 보관 — 원복할 때 사이트 값을 잃지 않도록 */
   const savedOffsets = new WeakMap();
 
-  function isDismissed() {
-    try {
-      return sessionStorage.getItem(DISMISS_KEY) === '1';
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function setDismissed() {
-    try {
-      sessionStorage.setItem(DISMISS_KEY, '1');
-    } catch (_) {
-      /* 스토리지가 막힌 사이트면 이번 페이지에서만 사라진다 */
-    }
-  }
+  /*
+   * 닫기는 이 페이지를 보고 있는 동안만 유지한다 — 새로고침하면 다시 나온다.
+   * 예전에는 sessionStorage 에 남겨 탭을 닫기 전까지 되살아나지 않았다.
+   */
+  let dismissed = false;
 
   /*
    * 문서 흐름을 배너 높이만큼 밀어낸다.
@@ -64,8 +53,12 @@
     enforcePush();
   }
 
+  /*
+   * box-sizing 을 함께 못박는다. html·body·앱 셸이 height:100% 로 이어지는 구조에서
+   * content-box 면 여백이 높이에 더해져 화면 아래쪽이 그만큼 잘린다.
+   */
   function pushCssText() {
-    return 'html{' + pushProp + ':' + pushPx + 'px !important;}';
+    return 'html{' + pushProp + ':' + pushPx + 'px !important;box-sizing:border-box !important;}';
   }
 
   function enforcePush() {
@@ -138,13 +131,8 @@
       for (const el of stack) {
         let node = el;
         let depth = 0;
-        while (
-          node &&
-          node.nodeType === 1 &&
-          node !== document.body &&
-          node !== document.documentElement &&
-          depth < 12
-        ) {
+        // body 도 후보다 — body 자체가 fixed 인 앱 셸이 있다
+        while (node && node.nodeType === 1 && node !== document.documentElement && depth < 12) {
           if (node !== host && !(host && host.contains(node))) candidates.add(node);
           node = node.parentElement;
           depth++;
@@ -156,32 +144,85 @@
       if (offsetEls.has(el)) return; // 이미 보정한 요소는 enforceOffsets 가 지킨다
 
       const cs = getComputedStyle(el);
-      if (cs.position !== 'fixed' && cs.position !== 'sticky') return;
+      const pos = cs.position;
+      if (pos !== 'fixed' && pos !== 'sticky' && pos !== 'absolute') return;
+      // absolute 는 뷰포트 기준으로 놓인 것만 — relative 조상 안의 요소는 함께 밀려 있다
+      if (pos === 'absolute' && !isViewportAnchored(el)) return;
 
       const current = parseFloat(cs[prop]);
       if (!Number.isFinite(current)) return; // auto 는 상단 고정이 아니다
 
       const rect = el.getBoundingClientRect();
-      if (rect.height > 260) return; // 전면 오버레이·모달은 건드리지 않는다
       if (atTop && rect.top > height + 4) return;
       if (!atTop && rect.bottom < window.innerHeight - height - 4) return;
 
-      pushElement(el, prop, current, height);
+      /*
+       * 뷰포트를 꽉 채우는 컨테이너는 앱 셸일 때가 많다. 문서 흐름 밖이라 padding 으로는
+       * 밀리지 않으므로 그 자체를 내려야 하고, 그러면 넘치는 만큼 높이도 줄여야 한다.
+       * 진짜 모달은 그대로 둔다.
+       */
+      const fills = fillsViewport(rect);
+      if (fills && looksModal(el)) return;
+      if (!fills && rect.height > 260) return; // 전면이 아닌 큰 오버레이는 건드리지 않는다
+
+      pushElement(el, prop, current, height, fills);
     });
   }
 
-  /* 요소 하나를 배너 높이만큼 내린다. 원래 인라인 값은 원복용으로 보관한다 */
-  function pushElement(el, prop, base, height) {
+  /* absolute 요소가 뷰포트(ICB) 기준으로 놓였는지 — body 가 static 이어야 한다 */
+  function isViewportAnchored(el) {
+    if (!document.body) return false;
+    return (
+      el.offsetParent === document.body &&
+      getComputedStyle(document.body).position === 'static'
+    );
+  }
+
+  function fillsViewport(rect) {
+    return rect.top <= 1 && rect.height >= window.innerHeight - 4;
+  }
+
+  function looksModal(el) {
+    if (el.tagName === 'DIALOG') return true;
+    const role = el.getAttribute('role');
+    if (role === 'dialog' || role === 'alertdialog') return true;
+    return el.getAttribute('aria-modal') === 'true';
+  }
+
+  /*
+   * 요소 하나를 배너 높이만큼 내린다. 원래 인라인 값은 원복용으로 보관한다.
+   * prev 가 있으면 재보정 — 원래 height 와 앞선 판단을 그대로 이어받는다.
+   */
+  function pushElement(el, prop, base, height, filling, prev) {
     const applied = base + height + 'px';
-    savedOffsets.set(el, {
+    const saved = {
       prop,
       value: el.style.getPropertyValue(prop),
       priority: el.style.getPropertyPriority(prop),
-      applied
-    });
+      applied,
+      filling: filling,
+      heightValue: prev ? prev.heightValue : el.style.getPropertyValue('height'),
+      heightPriority: prev ? prev.heightPriority : el.style.getPropertyPriority('height'),
+      appliedHeight: ''
+    };
+    savedOffsets.set(el, saved);
     offsetEls.add(el);
     el.setAttribute(OFFSET_MARK, '');
     el.style.setProperty(prop, applied, 'important');
+
+    if (!filling) return;
+    /*
+     * top 만 내려도 반대쪽이 0 으로 묶여 있으면(inset: 0) 높이는 알아서 줄어든다.
+     * height 가 못박힌 경우에만 손대고, fixed 의 % 는 뷰포트 기준이라 calc 가 정확하다.
+     */
+    const needShrink = prev
+      ? !!prev.appliedHeight
+      : el.getBoundingClientRect().bottom > window.innerHeight + 1;
+    if (needShrink) {
+      const shrunk = 'calc(100% - ' + height + 'px)';
+      saved.appliedHeight = shrunk;
+      el.style.setProperty('height', shrunk, 'important');
+    }
   }
 
   /*
@@ -203,11 +244,15 @@
       }
 
       const inline = el.style.getPropertyValue(prop);
-      if (inline === saved.applied) return; // 그대로 유지되고 있다
+      const heightKept =
+        !saved.appliedHeight || el.style.getPropertyValue('height') === saved.appliedHeight;
+      if (inline === saved.applied && heightKept) return; // 그대로 유지되고 있다
 
       // 사이트가 방금 쓴 값을 새 기준으로 삼는다 — 없으면 계산값에서 읽는다
       let base = parseFloat(inline);
-      if (!Number.isFinite(base)) {
+      if (inline === saved.applied) {
+        base = parseFloat(inline) - height; // 높이만 지워진 경우 — 기준은 그대로다
+      } else if (!Number.isFinite(base)) {
         el.style.removeProperty(prop);
         base = parseFloat(getComputedStyle(el)[prop]);
       }
@@ -218,7 +263,7 @@
         el.removeAttribute(OFFSET_MARK);
         return;
       }
-      pushElement(el, prop, base, height);
+      pushElement(el, prop, base, height, saved.filling, saved);
     });
   }
 
@@ -238,6 +283,13 @@
       savedOffsets.delete(el);
       if (saved.value) el.style.setProperty(saved.prop, saved.value, saved.priority);
       else el.style.removeProperty(saved.prop);
+      if (saved.appliedHeight) {
+        if (saved.heightValue) {
+          el.style.setProperty('height', saved.heightValue, saved.heightPriority);
+        } else {
+          el.style.removeProperty('height');
+        }
+      }
     });
   }
 
@@ -261,7 +313,7 @@
       ? EnvBannerMatch.find(location.href, config.environments)
       : null;
 
-    if (!found || isDismissed()) {
+    if (!found || dismissed) {
       teardown();
       return;
     }
@@ -280,7 +332,7 @@
         settings: config.settings,
         mode: 'fixed',
         onDismiss: () => {
-          setDismissed();
+          dismissed = true;
           teardown();
         }
       });
@@ -306,6 +358,8 @@
     const prev = config;
     config = cfg;
     EnvBannerI18n.setLocale(cfg.settings.locale);
+    // 설정을 직접 만졌다면 다시 보고 싶다는 뜻이므로 숨김을 푼다
+    dismissed = false;
     // 언어가 바뀌면 배너의 버튼 라벨을 다시 만들어야 한다
     if (prev && prev.settings.locale !== cfg.settings.locale && instance) {
       instance.destroy();
@@ -349,6 +403,7 @@
       tickRaf = 0;
       if (location.href !== lastUrl) {
         lastUrl = location.href;
+        dismissed = false; // 페이지가 바뀌었으면 새로고침과 같게 다시 보여준다
         apply();
         return;
       }
@@ -375,6 +430,7 @@
   setInterval(() => {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
+      dismissed = false;
       apply();
       return;
     }
