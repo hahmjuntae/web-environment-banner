@@ -25,6 +25,23 @@
     height: 44px; background: #3d8bf5; color: #0a0a0a; display: flex;
     align-items: center; padding: 0 12px; font-weight: 700; }
 
+  /* 100vh 로 높이를 못박은 앱 셸 — 밀어내기로 줄지 않는다 */
+  html.k-vh-shell, html.k-vh-shell body { overflow: hidden; }
+  html.k-vh-shell #root { height: 100vh; display: grid; grid-template-rows: 24px 1fr; }
+  html.k-vh-shell #scroller { overflow: auto; }
+
+  /* 문서를 스크롤포트로 쓰는 sticky 헤더 */
+  html.k-sticky-doc #stickyHeader { position: sticky; top: 0; z-index: 20;
+    height: 44px; background: #f5a312; color: #0a0a0a; display: flex;
+    align-items: center; padding: 0 12px; font-weight: 700; }
+
+  /* 내부 스크롤 컨테이너 안의 sticky 헤더 */
+  html.k-sticky-inner, html.k-sticky-inner body { height: 100%; overflow: hidden; }
+  html.k-sticky-inner #root { height: 100%; overflow: auto; }
+  html.k-sticky-inner #stickyHeader { position: sticky; top: 0; z-index: 20;
+    height: 44px; background: #f5a312; color: #0a0a0a; display: flex;
+    align-items: center; padding: 0 12px; font-weight: 700; }
+
   /* 사이트가 html 여백을 강제로 0 으로 못박은 경우 */
   html.k-pad-important { padding-top: 0 !important; padding-bottom: 0 !important; }
 
@@ -37,10 +54,13 @@
 <body>
 <div id="root">
   <div id="absHeader" hidden>absolute 헤더</div>
+  <div id="stickyHeader" hidden>sticky 헤더</div>
   <div id="topmark">최상단 마커 — 배너 아래로 내려가야 한다</div>
-  <div class="box"></div>
-  <div class="box"></div>
-  <div class="box" id="lastBox"></div>
+  <div id="scroller">
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box" id="lastBox"></div>
+  </div>
 </div>
 <div id="overlay"><strong>전면 오버레이</strong></div>
 <script>
@@ -48,6 +68,7 @@
   document.documentElement.classList.add('k-' + kind);
   document.title = 'layout:' + kind;
   if (kind === 'abs-header') document.getElementById('absHeader').hidden = false;
+  if (kind.indexOf('sticky-') === 0) document.getElementById('stickyHeader').hidden = false;
   if (kind === 'modal') {
     const o = document.getElementById('overlay');
     o.setAttribute('role', 'dialog');

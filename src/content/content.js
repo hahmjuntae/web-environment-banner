@@ -21,6 +21,10 @@
   let pushPx = 0;
   let lastPushCheck = 0;
 
+  /* vh 로 높이를 못박은 앱 셸의 축소 상태 */
+  const shrunkEls = new Set();
+  const savedShrink = new WeakMap();
+
   /*
    * 보정한 고정 요소들. 마커 속성은 사이트 스크립트가 지울 수 있어 추적에 쓰지 않고,
    * 이 Set 을 기준으로 순회한다. 끊긴 요소는 순회 중에 걷어낸다.
@@ -107,6 +111,72 @@
   }
 
   /*
+   * html 여백은 100vh 로 높이를 못박은 앱 셸을 줄이지 못한다. 셸이 통째로 배너 높이만큼
+   * 화면 밖으로 밀려 내부 스크롤 영역의 끝에 닿을 수 없게 되므로 max-height 로 줄인다.
+   * 문서가 스크롤되는 페이지는 밀린 만큼 내려서 볼 수 있으니 손대지 않는다.
+   */
+  function shrinkViewportBoxes(settings) {
+    const vh = window.innerHeight;
+    if (!document.body || !vh) return;
+    if (document.documentElement.scrollHeight > vh + settings.height + 4) return;
+
+    const limit = 'calc(100vh - ' + settings.height + 'px)';
+    eachShallowChild(document.body, 4, (el) => {
+      if (shrunkEls.has(el) || el === host) return;
+
+      const cs = getComputedStyle(el);
+      if (cs.position === 'fixed' || cs.position === 'absolute') return;
+
+      const rect = el.getBoundingClientRect();
+      // 뷰포트 높이 그대로인 상자만 — 밀어내기로 줄었으면 대상 아님
+      if (Math.abs(rect.height - vh) > 2) return;
+      if (rect.top > settings.height + 2) return;
+
+      savedShrink.set(el, {
+        value: el.style.getPropertyValue('max-height'),
+        priority: el.style.getPropertyPriority('max-height')
+      });
+      shrunkEls.add(el);
+      el.style.setProperty('max-height', limit, 'important');
+    });
+  }
+
+  function eachShallowChild(root, depth, fn) {
+    if (depth <= 0) return;
+    for (const el of root.children) {
+      fn(el);
+      eachShallowChild(el, depth - 1, fn);
+    }
+  }
+
+  /* 사이트가 인라인 style 을 다시 써도 축소를 유지 */
+  function enforceShrink(settings) {
+    if (!shrunkEls.size) return;
+    const limit = 'calc(100vh - ' + settings.height + 'px)';
+    shrunkEls.forEach((el) => {
+      if (!el.isConnected) {
+        shrunkEls.delete(el);
+        savedShrink.delete(el);
+        return;
+      }
+      if (el.style.getPropertyValue('max-height') !== limit) {
+        el.style.setProperty('max-height', limit, 'important');
+      }
+    });
+  }
+
+  function clearShrink() {
+    shrunkEls.forEach((el) => {
+      const saved = savedShrink.get(el);
+      savedShrink.delete(el);
+      if (!saved) return;
+      if (saved.value) el.style.setProperty('max-height', saved.value, saved.priority);
+      else el.style.removeProperty('max-height');
+    });
+    shrunkEls.clear();
+  }
+
+  /*
    * 사이트가 직접 띄운 fixed·sticky 헤더는 문서 흐름 밖이라 padding 으로 밀리지 않는다.
    * 배너와 겹치는 것만 찾아 top(또는 bottom)을 배너 높이만큼 내려준다.
    */
@@ -148,6 +218,7 @@
       if (pos !== 'fixed' && pos !== 'sticky' && pos !== 'absolute') return;
       // absolute 는 뷰포트 기준으로 놓인 것만 — relative 조상 안의 요소는 함께 밀려 있다
       if (pos === 'absolute' && !isViewportAnchored(el)) return;
+      if (pos === 'sticky' && !stickyNeedsOffset(el, settings)) return;
 
       const current = parseFloat(cs[prop]);
       if (!Number.isFinite(current)) return; // auto 는 상단 고정이 아니다
@@ -176,6 +247,27 @@
       el.offsetParent === document.body &&
       getComputedStyle(document.body).position === 'static'
     );
+  }
+
+  /* sticky 는 흐름 안이라 밀어내기로 이미 내려감 */
+  function stickyNeedsOffset(el, settings) {
+    if (!settings.pushContent) return false;
+    return !scrollportAncestor(el);
+  }
+
+  /* 내부 스크롤 컨테이너 없으면 뷰포트 기준 */
+  function scrollportAncestor(el) {
+    let node = el.parentElement;
+    while (node && node !== document.documentElement) {
+      const cs = getComputedStyle(node);
+      if (isScrollBox(cs.overflowY) || isScrollBox(cs.overflowX)) return node;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function isScrollBox(value) {
+    return value === 'auto' || value === 'scroll' || value === 'hidden' || value === 'overlay';
   }
 
   function fillsViewport(rect) {
@@ -303,6 +395,7 @@
       host = null;
     }
     clearPush();
+    clearShrink();
     clearFixedOffsets();
   }
 
@@ -342,6 +435,9 @@
 
     setPush(config.settings.pushContent, config.settings);
 
+    if (config.settings.pushContent) shrinkViewportBoxes(config.settings);
+    else clearShrink();
+
     if (config.settings.offsetFixed) offsetFixed(config.settings);
     else clearFixedOffsets();
   }
@@ -373,6 +469,7 @@
         prev.settings.offsetFixed !== cfg.settings.offsetFixed)
     ) {
       clearFixedOffsets();
+      clearShrink();
     }
     apply();
   });
@@ -385,7 +482,10 @@
       apply();
       return;
     }
-    if (config.settings.pushContent) enforcePush();
+    if (config.settings.pushContent) {
+      enforcePush();
+      enforceShrink(config.settings);
+    }
     if (config.settings.offsetFixed) enforceOffsets(config.settings);
   }
 
@@ -408,10 +508,11 @@
         return;
       }
       enforce();
-      // 새로 렌더된 고정 헤더 탐색은 비싸므로 간격을 둔다
-      if (config && instance && config.settings.offsetFixed && Date.now() - lastScan > 300) {
+      // 새로 렌더된 고정 헤더·앱 셸 탐색은 비싸므로 간격을 둔다
+      if (config && instance && Date.now() - lastScan > 300) {
         lastScan = Date.now();
-        offsetFixed(config.settings);
+        if (config.settings.pushContent) shrinkViewportBoxes(config.settings);
+        if (config.settings.offsetFixed) offsetFixed(config.settings);
       }
     });
   }
@@ -435,6 +536,8 @@
       return;
     }
     enforce();
-    if (instance && config && config.settings.offsetFixed) offsetFixed(config.settings);
+    if (!instance || !config) return;
+    if (config.settings.pushContent) shrinkViewportBoxes(config.settings);
+    if (config.settings.offsetFixed) offsetFixed(config.settings);
   }, 1000);
 })();
